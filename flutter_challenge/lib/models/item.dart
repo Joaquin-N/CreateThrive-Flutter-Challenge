@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_challenge/models/item_category.dart';
 
 class Item {
-  int? id;
+  String? id;
   String name;
   DateTime? favAddDate;
   String? imgUrl;
@@ -13,7 +13,7 @@ class Item {
       {'id': id, 'name': name, 'fav_add_date': favAddDate, 'img_url': imgUrl};
 
   Item.fromSnapshot(DocumentSnapshot snap)
-      : id = snap['id'],
+      : id = snap.id,
         name = snap['name'],
         favAddDate = snap['fav_add_date'],
         imgUrl = snap['img_url'];

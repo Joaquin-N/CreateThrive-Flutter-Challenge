@@ -4,15 +4,44 @@ import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/services/firestore.dart';
 
 class ItemCategory {
+  String? id;
   String name;
   Color color;
-  List<int> itemsId = [];
-  List<Item> items = [];
+  List<Item> _items = [];
+  List<String> docs = [];
+  bool _show = true;
 
   ItemCategory({required this.name, required this.color});
 
-  void addItem(Item item) {
-    items.add(item);
+  set items(List<Item> values) {
+    _items.clear();
+    for (String doc in docs) {
+      _items.add(values.firstWhere((item) => item.id == doc));
+    }
+  }
+
+  List<Item> get items => _items;
+
+  bool get show => _show;
+
+  void toggleShow() {
+    _show = !_show;
+  }
+
+  void insertItem(Item item) {
+    int index = -1;
+    for (int i = 0; i < items.length; i++) {
+      if (items[i].id == item.id) {
+        index = i;
+        break;
+      }
+    }
+    if (index != -1) {
+      items.removeAt(index);
+      items.insert(index, item);
+    } else {
+      items.add(item);
+    }
   }
 
   void reorder(int oldIndex, int newIndex) {
@@ -23,24 +52,17 @@ class ItemCategory {
     items.insert(newIndex, item);
   }
 
-  void _updateItemsIds() {
-    itemsId.clear();
-    for (Item i in items) {
-      itemsId.add(i.id!);
-    }
-  }
-
   Map<String, dynamic> toDocument() {
-    _updateItemsIds();
     return {
       'name': name,
       'color': color.value,
-      'items_id': itemsId,
+      'items_doc': List.generate(items.length, (index) => items[index].id),
     };
   }
 
   ItemCategory.fromSnapshot(DocumentSnapshot snap)
-      : name = snap['name'],
+      : id = snap.id,
+        name = snap['name'],
         color = Color(snap['color']),
-        itemsId = snap['items_id'].cast<int>();
+        docs = snap['items_doc'].cast<String>();
 }

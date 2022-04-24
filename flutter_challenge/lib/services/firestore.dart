@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
+import 'package:async/async.dart';
 
 class Firestore {
   static Firestore? _instance;
@@ -14,10 +15,21 @@ class Firestore {
   final _items = FirebaseFirestore.instance.collection('items');
   final _categories = FirebaseFirestore.instance.collection('categories');
 
+  // Stream<Item> getCategoryItems(ItemCategory category) {
+  //   List<Stream<Item>> streamList = [];
+  //   for (String doc in category.docs) {
+  //     streamList.add(
+  //         _items.doc(doc).snapshots().map((event) => Item.fromSnapshot(event)));
+  //   }
+  //   return StreamGroup.merge(streamList);
+  // }
+
   Stream<List<Item>> getCategoryItems(ItemCategory category) {
-    return _items.where('id', whereIn: category.itemsId).snapshots().map(
-        (snapshot) =>
-            snapshot.docs.map((doc) => Item.fromSnapshot(doc)).toList());
+    return _items
+        .where(FieldPath.documentId, whereIn: category.docs)
+        .snapshots()
+        .map((snap) =>
+            snap.docs.map((docSnap) => Item.fromSnapshot(docSnap)).toList());
   }
 
   Stream<List<ItemCategory>> getCategories() {
@@ -34,23 +46,20 @@ class Firestore {
 
   Future<bool> addCategory(ItemCategory cat) async {
     if (await _checkCategoryExistence(cat.name)) return false;
-    await _categories.add(cat.toDocument());
+    var doc = await _categories.add(cat.toDocument());
+    cat.id = doc.id;
     return true;
   }
 
   Future<bool> updateCategory(ItemCategory cat) async {
-    var doc = await _categories
-        .where('name', isEqualTo: cat.name)
-        .get()
-        .then((value) => value.docs.first.reference);
-    await doc.update(cat.toDocument());
+    await _categories.doc(cat.id).update(cat.toDocument());
     return true;
   }
 
   Future<bool> addItem(Item item) async {
     if (await _checkItemExistence(item.name)) return false;
-    item.id = await _getNextId();
-    await _items.add(item.toDocument());
+    var doc = await _items.add(item.toDocument());
+    item.id = doc.id;
     return true;
   }
 
@@ -64,11 +73,11 @@ class Firestore {
     await addItem(item3);
 
     ItemCategory cat1 = ItemCategory(name: 'cat1', color: Colors.red);
-    cat1.addItem(item1);
+    cat1.insertItem(item1);
 
     ItemCategory cat2 = ItemCategory(name: 'cat2', color: Colors.blue);
-    cat2.addItem(item2);
-    cat2.addItem(item3);
+    cat2.insertItem(item2);
+    cat2.insertItem(item3);
 
     addCategory(cat1);
     addCategory(cat2);
@@ -86,14 +95,5 @@ class Firestore {
         .where('name', isEqualTo: name)
         .get()
         .then((value) => value.size != 0);
-  }
-
-  Future<int> _getNextId() async {
-    DocumentReference doc =
-        FirebaseFirestore.instance.collection('data').doc('ids');
-    int last = await doc.get().then((value) => value.get('last_item_id'));
-    int id = last + 1;
-    await doc.update({'last_item_id': id});
-    return id;
   }
 }
