@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "504621915820",
+    "project_id": "flutter-challenge-c6dce",
+    "storage_bucket": "flutter-challenge-c6dce.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:504621915820:android:f7d99a1695aff891948909",
+        "android_client_info": {
+          "package_name": "com.example.flutter_challenge"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "504621915820-8lf4uasbboc4dq7c9emreschhr03chc8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB49zHSwCtdzBX7YQuDDA0vDzNl38GHYfE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "504621915820-8lf4uasbboc4dq7c9emreschhr03chc8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:504621915820:android:0db95c31cba07402948909",
+        "android_client_info": {
+          "package_name": "com.neschisi.flutter_challenge"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "504621915820-8lf4uasbboc4dq7c9emreschhr03chc8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB49zHSwCtdzBX7YQuDDA0vDzNl38GHYfE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "504621915820-8lf4uasbboc4dq7c9emreschhr03chc8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
