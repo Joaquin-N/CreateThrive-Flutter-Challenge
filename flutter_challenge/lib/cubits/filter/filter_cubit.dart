@@ -1,21 +1,34 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_challenge/cubits/application/application_cubit.dart';
 
 part 'filter_state.dart';
 
 class FilterCubit extends Cubit<FilterState> {
-  FilterCubit() : super(FilterItemsDisabled(TextEditingController())) {
+  final Stream<ApplicationState> applicationStateStream;
+  FilterCubit(this.applicationStateStream)
+      : super(FilterItemsDisabled(TextEditingController())) {
     state.controller!.addListener(() {
-      search(state.controller!.text);
+      _search();
+    });
+    applicationStateStream.listen((appState) {
+      if (appState is ApplicationShoppingList)
+        _search();
+      else if (appState is ApplicationFavorites) _favorites();
     });
   }
 
-  void search(filter) {
-    if (filter == '') {
+  void _search() {
+    String value = state.controller!.text;
+    if (value == '') {
       _disable();
     } else {
-      _filter(filter);
+      _filter(value);
     }
+  }
+
+  void _favorites() {
+    emit(FilterFavorites(state.controller));
   }
 
   void toggleFilter() {
@@ -40,9 +53,9 @@ class FilterCubit extends Cubit<FilterState> {
         : FilterItemsDisabled(state.controller));
   }
 
-  void _filter(String filter) {
+  void _filter(String value) {
     emit(state is FilterCategories
-        ? FilterCategoriesEnabled(filter, state.controller)
-        : FilterItemsEnabled(filter, state.controller));
+        ? FilterCategoriesEnabled(value, state.controller)
+        : FilterItemsEnabled(value, state.controller));
   }
 }

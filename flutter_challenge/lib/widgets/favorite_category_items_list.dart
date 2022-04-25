@@ -6,9 +6,10 @@ import 'package:flutter_challenge/cubits/item/item_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
 import 'package:flutter_challenge/widgets/Favorite_snack_bar.dart';
+import 'package:intl/intl.dart';
 
-class CategoryItemsList extends StatelessWidget {
-  const CategoryItemsList({
+class FavoriteCategoryItemsList extends StatelessWidget {
+  const FavoriteCategoryItemsList({
     Key? key,
     required this.cubit,
   }) : super(key: key);
@@ -26,43 +27,26 @@ class CategoryItemsList extends StatelessWidget {
           width: double.infinity,
           child: Column(
             children: [
-              GestureDetector(
-                onTap: cubit.toggleShow,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 18),
-                  height: 50,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(width: 32.0),
-                      Text(
-                        category.name,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Icon(state is CategoryShowItems
-                          ? Icons.arrow_drop_down
-                          : Icons.arrow_left),
-                    ],
-                  ),
+              Container(
+                alignment: Alignment.center,
+                height: 50,
+                child: Text(
+                  category.name,
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
-              if (state is CategoryShowItems)
-                ReorderableListView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  onReorder: (oldIndex, newIndex) =>
-                      cubit.reorder(oldIndex, newIndex),
-                  children: List.generate(
-                    category.itemsId.length,
-                    (index) {
-                      return ItemListTile(
-                        index: index,
-                        cubit: state.itemCubits[index],
-                        key: Key('$index'),
-                      );
-                    },
-                  ),
+              ListView(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                children: List.generate(
+                  category.itemsId.length,
+                  (index) {
+                    return ItemListTile(
+                      cubit: state.itemCubits[index],
+                    );
+                  },
                 ),
+              ),
             ],
           ),
         );
@@ -74,11 +58,9 @@ class CategoryItemsList extends StatelessWidget {
 class ItemListTile extends StatelessWidget {
   const ItemListTile({
     Key? key,
-    required this.index,
     required this.cubit,
   }) : super(key: key);
 
-  final int index;
   final ItemCubit cubit;
 
   @override
@@ -88,21 +70,9 @@ class ItemListTile extends StatelessWidget {
       builder: (context, state) {
         if (state is ItemNotShowing) return Container();
         return ListTile(
-          onLongPress: () => print('edit'),
           title: Text(state.item.name),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                  onPressed: () => cubit.toggleFav(),
-                  icon: Icon(
-                      state is ItemFavorite ? Icons.star : Icons.star_border)),
-              ReorderableDragStartListener(
-                index: index,
-                child: const Icon(Icons.drag_handle),
-              ),
-            ],
-          ),
+          subtitle: Text('Added on ' +
+              DateFormat('dd/MM/yyyy').format(state.item.favAddDate!)),
         );
       },
       listenWhen: (oldState, newState) {

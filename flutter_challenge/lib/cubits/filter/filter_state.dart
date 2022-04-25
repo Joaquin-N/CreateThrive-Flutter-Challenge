@@ -35,3 +35,7 @@ class FilterCategoriesEnabled extends FilterState
   const FilterCategoriesEnabled(value, tec)
       : super(filter: value, controller: tec);
 }
+
+class FilterFavorites extends FilterState {
+  const FilterFavorites(tec) : super(controller: tec);
+}

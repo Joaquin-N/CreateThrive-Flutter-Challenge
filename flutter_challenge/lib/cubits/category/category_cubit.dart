@@ -11,15 +11,24 @@ part 'category_state.dart';
 
 class CategoryCubit extends Cubit<CategoryState> {
   final String categoryId;
-  final FilterCubit filterCubit;
+  final Stream<FilterState> filterStateStream;
   final fs = Firestore.instance;
 
-  CategoryCubit({required this.categoryId, required this.filterCubit})
+  CategoryCubit({required this.categoryId, required this.filterStateStream})
       : super(LoadingCategory()) {
     _loadCategory();
 
-    filterCubit.stream.listen((filterState) async {
-      if (filterState is FilterDisabled) {
+    filterStateStream.listen((filterState) async {
+      if (filterState is FilterFavorites) {
+        await Future.delayed(Duration(milliseconds: 1));
+        for (ItemCubit cubit in state.itemCubits) {
+          if (cubit.state is! ItemNotShowing) {
+            _show();
+            return;
+          }
+        }
+        _hide();
+      } else if (filterState is FilterDisabled) {
         _show();
       } else if (filterState is FilterCategories) {
         if (state.category.name.startsWith(filterState.filter)) {
@@ -95,7 +104,8 @@ class CategoryCubit extends Cubit<CategoryState> {
       List<ItemCubit> cubits = List.generate(
           category.itemsId.length,
           (index) => ItemCubit(
-              itemId: category.itemsId[index], filterCubit: filterCubit));
+              itemId: category.itemsId[index],
+              filterStateStream: filterStateStream));
       if (state is CategoryHideItems) {
         emit(CategoryHideItems(category, cubits));
       } else {

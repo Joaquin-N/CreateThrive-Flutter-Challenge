@@ -1,15 +1,19 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter_challenge/cubits/category/category_cubit.dart';
+import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
 import 'package:flutter_challenge/services/firestore.dart';
 import 'package:meta/meta.dart';
 
-part 'app_state.dart';
+part 'data_state.dart';
 
-class AppCubit extends Cubit<AppState> {
+class DataCubit extends Cubit<DataState> {
   final fs = Firestore.instance;
+  final Stream<FilterState> filterStateStream;
+  //final FilterCubit filterCubit;
 
-  AppCubit() : super(AppLoading()) {
+  DataCubit(this.filterStateStream) : super(DataLoading()) {
     _loadCategories();
   }
 
@@ -20,8 +24,12 @@ class AppCubit extends Cubit<AppState> {
 
   void _loadCategories() {
     fs.getCategoriesIds().listen((event) {
-      if (state.categories.length != event.length) {
-        emit(AppReady(event));
+      if (state.categoryCubits.length != event.length) {
+        emit(DataReady(List.generate(
+            event.length,
+            (index) => CategoryCubit(
+                categoryId: event[index],
+                filterStateStream: filterStateStream))));
       }
     });
   }

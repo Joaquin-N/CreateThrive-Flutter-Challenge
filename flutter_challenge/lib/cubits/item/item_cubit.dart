@@ -8,14 +8,19 @@ part 'item_state.dart';
 
 class ItemCubit extends Cubit<ItemState> {
   final String itemId;
-  final FilterCubit filterCubit;
+  final Stream<FilterState> filterStateStream;
   final fs = Firestore.instance;
 
-  ItemCubit({required this.itemId, required this.filterCubit})
+  ItemCubit({required this.itemId, required this.filterStateStream})
       : super(ItemLoading()) {
     _loadItem();
-    filterCubit.stream.listen((filterState) {
-      if (filterState is FilterDisabled || filterState is FilterCategories) {
+    filterStateStream.listen((filterState) {
+      if (filterState is FilterFavorites) {
+        if (state is! ItemFavorite) {
+          emit(ItemNotShowing(state.item));
+        }
+      } else if (filterState is FilterDisabled ||
+          filterState is FilterCategories) {
         _emitState(state.item);
       } else {
         if (state.item.name.startsWith(filterState.filter)) {

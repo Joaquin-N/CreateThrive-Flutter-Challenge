@@ -1,48 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_challenge/cubits/app/app_cubit.dart';
+import 'package:flutter_challenge/cubits/data/data_cubit.dart';
 import 'package:flutter_challenge/cubits/category/category_cubit.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
 import 'package:flutter_challenge/widgets/category_items_list.dart';
 import 'package:flutter_challenge/widgets/filter_button.dart';
+import 'package:flutter_challenge/widgets/items_list.dart';
 
 class ShoppingListPage extends StatelessWidget {
   const ShoppingListPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: BlocBuilder<AppCubit, AppState>(
-        builder: (context, state) {
-          if (state is AppReady) {
-            return Column(
-              children: [
-                BlocBuilder<FilterCubit, FilterState>(
-                  builder: (context, state) {
-                    return FilteringBar(
-                      text: state is FilterItems ? 'Items' : 'Categories',
-                      color: state is FilterItems ? Colors.red : Colors.blue,
-                      onFilterChange: () =>
-                          context.read<FilterCubit>().toggleFilter(),
-                      onClear: () => context.read<FilterCubit>().cancelFilter(),
-                      controller: state.controller!,
-                    );
-                  },
-                ),
-                Column(
-                  children: List.generate(
-                    state.categories.length,
-                    (index) =>
-                        CategoryItemsList(categoryId: state.categories[index]),
-                  ),
-                ),
-              ],
+    return Column(
+      children: [
+        BlocBuilder<FilterCubit, FilterState>(
+          builder: (context, state) {
+            return FilteringBar(
+              text: state is FilterItems ? 'Items' : 'Categories',
+              color: state is FilterItems ? Colors.red : Colors.blue,
+              onFilterChange: () => context.read<FilterCubit>().toggleFilter(),
+              onClear: () => context.read<FilterCubit>().cancelFilter(),
+              controller: state.controller!,
             );
-          } else {
-            return Container();
-          }
-        },
-      ),
+          },
+        ),
+        ItemsList(),
+      ],
     );
   }
 }
