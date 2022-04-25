@@ -24,21 +24,22 @@ class CategoryItemsList extends StatelessWidget {
               ),
               if (state is ShowCategory)
                 ReorderableListView(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    onReorder: (oldIndex, newIndex) => context
-                        .read<CategoryCubit>()
-                        .reorder(oldIndex, newIndex),
-                    children: List.generate(category.items.length, (index) {
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  onReorder: (oldIndex, newIndex) =>
+                      context.read<CategoryCubit>().reorder(oldIndex, newIndex),
+                  children: List.generate(
+                    category.items.length,
+                    (index) {
                       Item item = category.items[index];
-                      return BlocProvider(
-                        key: ValueKey(index.toString()),
-                        create: (context) => ItemCubit(item),
-                        child: ItemListTile(
-                          index: index,
-                        ),
+                      return ItemListTile(
+                        index: index,
+                        item: item,
+                        key: Key('$index'),
                       );
-                    })),
+                    },
+                  ),
+                ),
             ],
           ),
         );
@@ -51,17 +52,21 @@ class ItemListTile extends StatelessWidget {
   const ItemListTile({
     Key? key,
     required this.index,
+    required this.item,
   }) : super(key: key);
 
   final int index;
+  final Item item;
 
   @override
   Widget build(BuildContext context) {
+    var cubit = ItemCubit(item);
     return BlocBuilder<ItemCubit, ItemState>(
+      bloc: cubit,
       builder: (context, state) {
         return ListTile(
           onLongPress: () => print('edit'),
-          title: Text(state.item.name),
+          title: Text(cubit.item.name),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
