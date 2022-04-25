@@ -1,12 +1,16 @@
 part of 'category_cubit.dart';
 
 @immutable
-abstract class CategoryState {}
+abstract class CategoryState {
+  final ItemCategory category;
 
-class CategoryLoading extends CategoryState {}
+  const CategoryState(this.category);
+}
 
-class CategoryReady extends CategoryState {
-  final List<ItemCategory> categories;
+class HideCategory extends CategoryState {
+  const HideCategory(ItemCategory category) : super(category);
+}
 
-  CategoryReady({this.categories = const <ItemCategory>[]});
+class ShowCategory extends CategoryState {
+  const ShowCategory(ItemCategory category) : super(category);
 }

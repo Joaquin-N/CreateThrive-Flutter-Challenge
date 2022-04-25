@@ -14,31 +14,25 @@ class AppCubit extends Cubit<AppState> {
     _loadCategories();
   }
 
-  void reorder(ItemCategory category, int oldIndex, int newIndex) {
-    category.reorder(oldIndex, newIndex);
-    fs.updateCategory(category);
-    emit(AppReady(categories));
-  }
-
-  void toggleShow(ItemCategory category) {
-    category.toggleShow();
-    emit(AppReady(categories));
-  }
+  // void toggleShow(ItemCategory category) {
+  //   category.toggleShow();
+  //   emit(AppReady(categories));
+  // }
 
   void _loadCategories() {
     fs.getCategories().listen((event) {
       categories = event;
-      _loadItems();
+      emit(AppReady(categories));
     });
   }
 
-  void _loadItems() {
-    for (ItemCategory cat in categories) {
-      fs.getCategoryItems(cat).listen((items) {
-        cat.items = items;
-        print('Items of category ${cat.name} reloaded');
-        emit(AppReady(categories));
-      });
-    }
-  }
+  // void _loadItems() {
+  //   for (ItemCategory cat in categories) {
+  //     fs.getCategoryItems(cat).listen((items) {
+  //       cat.items = items;
+  //       print('Items of category ${cat.name} reloaded');
+  //       emit(AppReady(categories));
+  //     });
+  //   }
+  // }
 }

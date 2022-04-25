@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_challenge/cubits/app/app_cubit.dart';
 import 'package:flutter_challenge/firebase_options.dart';
+import 'package:flutter_challenge/pages/home_page.dart';
 import 'package:flutter_challenge/pages/shopping_list_page.dart';
 import 'package:flutter_challenge/routes.dart';
 import 'package:flutter_challenge/services/firestore.dart';
@@ -21,17 +22,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => AppCubit()),
-      ],
-      child: MaterialApp(
-        title: 'Flutter Challenge',
-        routes: {
-          Routes.shoppingList: (_) => const ShoppingListPage(),
-        },
-        initialRoute: Routes.shoppingList,
-      ),
+    return MaterialApp(
+      title: 'Flutter Challenge',
+      routes: {
+        Routes.home: (_) => const HomePage(),
+      },
+      initialRoute: Routes.home,
     );
   }
 }

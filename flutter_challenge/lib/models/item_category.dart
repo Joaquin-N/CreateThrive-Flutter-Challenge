@@ -1,15 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_challenge/models/item.dart';
-import 'package:flutter_challenge/services/firestore.dart';
 
 class ItemCategory {
   String? id;
   String name;
   Color color;
-  List<Item> _items = [];
   List<String> docs = [];
-  bool _show = true;
+
+  List<Item> _items = [];
 
   ItemCategory({required this.name, required this.color});
 
@@ -21,12 +20,9 @@ class ItemCategory {
   }
 
   List<Item> get items => _items;
-
-  bool get show => _show;
-
-  void toggleShow() {
-    _show = !_show;
-  }
+  // TODO: Sort favorites
+  List<Item> get favoriteItems =>
+      _items.where((item) => item.favAddDate != null).toList();
 
   void insertItem(Item item) {
     int index = -1;
