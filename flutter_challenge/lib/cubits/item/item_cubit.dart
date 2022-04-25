@@ -1,17 +1,19 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter_challenge/models/item.dart';
+import 'package:flutter_challenge/services/firestore.dart';
 import 'package:meta/meta.dart';
 
 part 'item_state.dart';
 
 class ItemCubit extends Cubit<ItemState> {
-  final Item item;
+  final String itemId;
+  final fs = Firestore.instance;
 
-  ItemCubit(this.item) : super(ItemReady(item));
+  ItemCubit(this.itemId) : super(ItemLoading()) {
+    _loadItem();
+  }
 
-  @override
-  Future<void> close() {
-    print('BLoC of item ${item.name} closed');
-    return super.close();
+  void _loadItem() {
+    fs.getItem(itemId).listen((item) => emit(ItemReady(item)));
   }
 }

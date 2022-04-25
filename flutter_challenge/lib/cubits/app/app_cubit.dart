@@ -8,7 +8,6 @@ part 'app_state.dart';
 
 class AppCubit extends Cubit<AppState> {
   final fs = Firestore.instance;
-  List<ItemCategory> categories = [];
 
   AppCubit() : super(AppLoading()) {
     _loadCategories();
@@ -20,9 +19,10 @@ class AppCubit extends Cubit<AppState> {
   // }
 
   void _loadCategories() {
-    fs.getCategories().listen((event) {
-      categories = event;
-      emit(AppReady(categories));
+    fs.getCategoriesIds().listen((event) {
+      if (state.categories.length != event.length) {
+        emit(AppReady(event));
+      }
     });
   }
 

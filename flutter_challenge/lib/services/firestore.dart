@@ -26,7 +26,7 @@ class Firestore {
 
   Stream<List<Item>> getCategoryItems(ItemCategory category) {
     return _items
-        .where(FieldPath.documentId, whereIn: category.docs)
+        .where(FieldPath.documentId, whereIn: category.itemsId)
         .snapshots()
         .map((snap) =>
             snap.docs.map((docSnap) => Item.fromSnapshot(docSnap)).toList());
@@ -35,6 +35,26 @@ class Firestore {
   Stream<List<ItemCategory>> getCategories() {
     return _categories.snapshots().map((snapshot) =>
         snapshot.docs.map((doc) => ItemCategory.fromSnapshot(doc)).toList());
+  }
+
+  Stream<List<String>> getCategoriesIds() {
+    return _categories
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => doc.id).toList());
+  }
+
+  Stream<ItemCategory> getCategory(String docId) {
+    return _categories
+        .doc(docId)
+        .snapshots()
+        .map(((snap) => ItemCategory.fromSnapshot(snap)));
+  }
+
+  Stream<Item> getItem(String docId) {
+    return _items
+        .doc(docId)
+        .snapshots()
+        .map(((snap) => Item.fromSnapshot(snap)));
   }
 
   // Stream<QuerySnapshot<ItemCategory>> getCategories2() {
@@ -73,11 +93,11 @@ class Firestore {
     await addItem(item3);
 
     ItemCategory cat1 = ItemCategory(name: 'cat1', color: Colors.red);
-    cat1.insertItem(item1);
+    cat1.addItemId(item1.id!);
 
     ItemCategory cat2 = ItemCategory(name: 'cat2', color: Colors.blue);
-    cat2.insertItem(item2);
-    cat2.insertItem(item3);
+    cat2.addItemId(item2.id!);
+    cat2.addItemId(item3.id!);
 
     addCategory(cat1);
     addCategory(cat2);

@@ -1,11 +1,15 @@
 part of 'app_cubit.dart';
 
 @immutable
-abstract class AppState {}
+abstract class AppState {
+  final List<String> categories;
+  const AppState(this.categories);
+}
 
-class AppLoading extends AppState {}
+class AppLoading extends AppState {
+  AppLoading() : super([]);
+}
 
 class AppReady extends AppState {
-  final List<ItemCategory> categories;
-  AppReady(this.categories);
+  const AppReady(List<String> categories) : super(categories);
 }

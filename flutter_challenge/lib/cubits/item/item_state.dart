@@ -6,6 +6,10 @@ abstract class ItemState {
   const ItemState(this.item);
 }
 
+class ItemLoading extends ItemState {
+  ItemLoading() : super(Item(name: ''));
+}
+
 class ItemReady extends ItemState {
   const ItemReady(Item item) : super(item);
 }

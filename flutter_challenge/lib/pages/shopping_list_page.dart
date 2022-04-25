@@ -16,10 +16,8 @@ class ShoppingListPage extends StatelessWidget {
             return Column(
               children: List.generate(
                 state.categories.length,
-                (index) => BlocProvider(
-                  create: (context) => CategoryCubit(state.categories[index]),
-                  child: CategoryItemsList(),
-                ),
+                (index) =>
+                    CategoryItemsList(categoryId: state.categories[index]),
               ),
             );
           } else {
