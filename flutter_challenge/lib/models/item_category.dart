@@ -5,12 +5,12 @@ import 'package:flutter_challenge/models/item.dart';
 class ItemCategory {
   String? id;
   String name;
-  Color color;
+  int color;
   List<String> itemsId = [];
 
   //List<Item> _items = [];
 
-  ItemCategory({required this.name, required this.color});
+  ItemCategory({this.name = '', this.color = 0});
 
   void addItemId(String id) {
     itemsId.add(id);
@@ -63,7 +63,7 @@ class ItemCategory {
   Map<String, dynamic> toDocument() {
     return {
       'name': name,
-      'color': color.value,
+      'color': color,
       'items_doc': itemsId,
     };
   }
@@ -71,6 +71,6 @@ class ItemCategory {
   ItemCategory.fromSnapshot(DocumentSnapshot snap)
       : id = snap.id,
         name = snap['name'],
-        color = Color(snap['color']),
+        color = snap['color'],
         itemsId = snap['items_doc'].cast<String>();
 }

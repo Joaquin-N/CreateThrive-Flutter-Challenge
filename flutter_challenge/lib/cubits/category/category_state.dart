@@ -3,18 +3,28 @@ part of 'category_cubit.dart';
 @immutable
 abstract class CategoryState {
   final ItemCategory category;
+  final List<ItemCubit> itemCubits;
 
-  const CategoryState(this.category);
+  const CategoryState(this.category, this.itemCubits);
 }
 
 class LoadingCategory extends CategoryState {
-  LoadingCategory() : super(ItemCategory(name: '', color: Colors.transparent));
+  LoadingCategory() : super(ItemCategory(), []);
 }
 
-class HideCategory extends CategoryState {
-  const HideCategory(ItemCategory category) : super(category);
+class CategoryHide extends CategoryState {
+  final bool showItems;
+  const CategoryHide(
+      ItemCategory category, List<ItemCubit> itemCubits, this.showItems)
+      : super(category, itemCubits);
 }
 
-class ShowCategory extends CategoryState {
-  const ShowCategory(ItemCategory category) : super(category);
+class CategoryHideItems extends CategoryState {
+  const CategoryHideItems(ItemCategory category, List<ItemCubit> itemCubits)
+      : super(category, itemCubits);
+}
+
+class CategoryShowItems extends CategoryState {
+  const CategoryShowItems(ItemCategory category, List<ItemCubit> itemCubits)
+      : super(category, itemCubits);
 }

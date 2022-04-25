@@ -14,13 +14,15 @@ class CategoryItemsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var cubit = CategoryCubit(categoryId);
+    var cubit = CategoryCubit(
+        categoryId: categoryId, filterCubit: context.read<FilterCubit>());
     return BlocBuilder<CategoryCubit, CategoryState>(
       bloc: cubit,
       builder: (context, state) {
         ItemCategory category = state.category;
+        if (state is CategoryHide) return Container();
         return Container(
-          color: category.color.withOpacity(0.6),
+          color: Color(category.color).withOpacity(0.6),
           width: double.infinity,
           child: Column(
             children: [
@@ -37,14 +39,14 @@ class CategoryItemsList extends StatelessWidget {
                         category.name,
                         style: TextStyle(fontSize: 16),
                       ),
-                      Icon(state is ShowCategory
+                      Icon(state is CategoryShowItems
                           ? Icons.arrow_drop_down
                           : Icons.arrow_left),
                     ],
                   ),
                 ),
               ),
-              if (state is ShowCategory)
+              if (state is CategoryShowItems)
                 ReorderableListView(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
@@ -55,7 +57,7 @@ class CategoryItemsList extends StatelessWidget {
                     (index) {
                       return ItemListTile(
                         index: index,
-                        itemId: category.itemsId[index],
+                        cubit: state.itemCubits[index],
                         key: Key('$index'),
                       );
                     },
@@ -73,16 +75,14 @@ class ItemListTile extends StatelessWidget {
   const ItemListTile({
     Key? key,
     required this.index,
-    required this.itemId,
+    required this.cubit,
   }) : super(key: key);
 
   final int index;
-  final String itemId;
+  final ItemCubit cubit;
 
   @override
   Widget build(BuildContext context) {
-    var cubit =
-        ItemCubit(itemId: itemId, filterCubit: context.read<FilterCubit>());
     return BlocConsumer<ItemCubit, ItemState>(
       bloc: cubit,
       builder: (context, state) {

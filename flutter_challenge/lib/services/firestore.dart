@@ -96,10 +96,10 @@ class Firestore {
     await addItem(item2);
     await addItem(item3);
 
-    ItemCategory cat1 = ItemCategory(name: 'cat1', color: Colors.red);
+    ItemCategory cat1 = ItemCategory(name: 'cat1', color: Colors.red.value);
     cat1.addItemId(item1.id!);
 
-    ItemCategory cat2 = ItemCategory(name: 'cat2', color: Colors.blue);
+    ItemCategory cat2 = ItemCategory(name: 'cat2', color: Colors.blue.value);
     cat2.addItemId(item2.id!);
     cat2.addItemId(item3.id!);
 

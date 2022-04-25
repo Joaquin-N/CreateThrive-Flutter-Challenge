@@ -15,10 +15,10 @@ class ItemCubit extends Cubit<ItemState> {
       : super(ItemLoading()) {
     _loadItem();
     filterCubit.stream.listen((filterState) {
-      if (filterState is FilterDisabled) {
+      if (filterState is FilterDisabled || filterState is FilterCategories) {
         _emitState(state.item);
       } else {
-        if (state.item.name.startsWith(filterState.itemName)) {
+        if (state.item.name.startsWith(filterState.filter)) {
           _emitState(state.item);
         } else {
           emit(ItemNotShowing(state.item));
