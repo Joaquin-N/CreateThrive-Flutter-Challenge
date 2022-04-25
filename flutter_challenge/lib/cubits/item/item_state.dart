@@ -10,6 +10,14 @@ class ItemLoading extends ItemState {
   ItemLoading() : super(Item(name: ''));
 }
 
-class ItemReady extends ItemState {
-  const ItemReady(Item item) : super(item);
+class ItemNotShowing extends ItemState {
+  const ItemNotShowing(Item item) : super(item);
+}
+
+class ItemNotFavorite extends ItemState {
+  const ItemNotFavorite(Item item) : super(item);
+}
+
+class ItemFavorite extends ItemState {
+  const ItemFavorite(Item item) : super(item);
 }

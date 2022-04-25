@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_challenge/cubits/category/category_cubit.dart';
+import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
 import 'package:flutter_challenge/cubits/item/item_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
+import 'package:flutter_challenge/widgets/Favorite_snack_bar.dart';
 
 class CategoryItemsList extends StatelessWidget {
   const CategoryItemsList({Key? key, required this.categoryId})
@@ -18,13 +20,29 @@ class CategoryItemsList extends StatelessWidget {
       builder: (context, state) {
         ItemCategory category = state.category;
         return Container(
-          color: category.color,
+          color: category.color.withOpacity(0.6),
           width: double.infinity,
           child: Column(
             children: [
               GestureDetector(
                 onTap: () => cubit.toggleShow(),
-                child: Text(category.name),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 18),
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(width: 32.0),
+                      Text(
+                        category.name,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Icon(state is ShowCategory
+                          ? Icons.arrow_drop_down
+                          : Icons.arrow_left),
+                    ],
+                  ),
+                ),
               ),
               if (state is ShowCategory)
                 ReorderableListView(
@@ -63,10 +81,12 @@ class ItemListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var cubit = ItemCubit(itemId);
-    return BlocBuilder<ItemCubit, ItemState>(
+    var cubit =
+        ItemCubit(itemId: itemId, filterCubit: context.read<FilterCubit>());
+    return BlocConsumer<ItemCubit, ItemState>(
       bloc: cubit,
       builder: (context, state) {
+        if (state is ItemNotShowing) return Container();
         return ListTile(
           onLongPress: () => print('edit'),
           title: Text(state.item.name),
@@ -74,7 +94,9 @@ class ItemListTile extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                  onPressed: () => print('fav'), icon: Icon(Icons.star_border)),
+                  onPressed: () => cubit.toggleFav(),
+                  icon: Icon(
+                      state is ItemFavorite ? Icons.star : Icons.star_border)),
               ReorderableDragStartListener(
                 index: index,
                 child: const Icon(Icons.drag_handle),
@@ -82,6 +104,15 @@ class ItemListTile extends StatelessWidget {
             ],
           ),
         );
+      },
+      listenWhen: (oldState, newState) {
+        return (oldState is ItemFavorite && newState is ItemNotFavorite) ||
+            (oldState is ItemNotFavorite && newState is ItemFavorite);
+      },
+      listener: (context, state) {
+        ScaffoldMessenger.of(context).showSnackBar(FavoriteSnackBar(
+            text:
+                'Item ${state.item.name} ${state is ItemFavorite ? "added to" : "removed from"} favorites'));
       },
     );
   }

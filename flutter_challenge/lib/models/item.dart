@@ -10,11 +10,11 @@ class Item {
   Item({required this.name});
 
   Map<String, dynamic> toDocument() =>
-      {'id': id, 'name': name, 'fav_add_date': favAddDate, 'img_url': imgUrl};
+      {'name': name, 'fav_add_date': favAddDate, 'img_url': imgUrl};
 
   Item.fromSnapshot(DocumentSnapshot snap)
       : id = snap.id,
         name = snap['name'],
-        favAddDate = snap['fav_add_date'],
+        favAddDate = snap['fav_add_date']?.toDate(),
         imgUrl = snap['img_url'];
 }

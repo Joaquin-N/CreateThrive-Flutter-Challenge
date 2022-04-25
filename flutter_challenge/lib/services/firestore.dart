@@ -57,6 +57,10 @@ class Firestore {
         .map(((snap) => Item.fromSnapshot(snap)));
   }
 
+  void updateItem(Item item) {
+    _items.doc(item.id).update(item.toDocument());
+  }
+
   // Stream<QuerySnapshot<ItemCategory>> getCategories2() {
   //   return _categories
   //       .withConverter<ItemCategory>(

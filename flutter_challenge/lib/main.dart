@@ -13,7 +13,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  Firestore.instance.fillData();
+  //Firestore.instance.fillData();
   runApp(const MyApp());
 }
 
