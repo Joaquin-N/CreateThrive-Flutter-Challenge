@@ -7,8 +7,8 @@ part 'filter_state.dart';
 class FilterCubit extends Cubit<FilterState> {
   final Stream<ApplicationState> applicationStateStream;
   FilterCubit(this.applicationStateStream)
-      : super(FilterItemsDisabled(TextEditingController())) {
-    state.controller!.addListener(() {
+      : super(FilterState(controller: TextEditingController())) {
+    state.controller.addListener(() {
       _search();
     });
     applicationStateStream.listen((appState) {
@@ -19,27 +19,23 @@ class FilterCubit extends Cubit<FilterState> {
   }
 
   void _search() {
-    String value = state.controller!.text;
+    String value = state.controller.text;
     if (value == '') {
       _disable();
     } else {
-      _filter(value);
+      _filter();
     }
   }
 
   void _favorites() {
-    emit(FilterFavorites(state.controller));
+    emit(state.copyWith(favorites: true));
   }
 
   void toggleFilter() {
-    if (state is FilterItemsEnabled) {
-      emit(FilterCategoriesEnabled(state.filter, state.controller));
-    } else if (state is FilterCategoriesEnabled) {
-      emit(FilterItemsEnabled(state.filter, state.controller));
-    } else if (state is FilterItemsDisabled) {
-      emit(FilterCategoriesDisabled(state.controller));
+    if (state.categories) {
+      emit(state.copyWith(categories: false));
     } else {
-      emit(FilterItemsDisabled(state.controller));
+      emit(state.copyWith(categories: true));
     }
   }
 
@@ -48,14 +44,10 @@ class FilterCubit extends Cubit<FilterState> {
   }
 
   void _disable() {
-    emit(state is FilterCategories
-        ? FilterCategoriesDisabled(state.controller)
-        : FilterItemsDisabled(state.controller));
+    emit(state.copyWith(enabled: false, favorites: false));
   }
 
-  void _filter(String value) {
-    emit(state is FilterCategories
-        ? FilterCategoriesEnabled(value, state.controller)
-        : FilterItemsEnabled(value, state.controller));
+  void _filter() {
+    emit(state.copyWith(enabled: true, favorites: false));
   }
 }

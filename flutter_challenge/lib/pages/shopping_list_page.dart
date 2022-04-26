@@ -17,11 +17,11 @@ class ShoppingListPage extends StatelessWidget {
         BlocBuilder<FilterCubit, FilterState>(
           builder: (context, state) {
             return FilteringBar(
-              text: state is FilterItems ? 'Items' : 'Categories',
-              color: state is FilterItems ? Colors.red : Colors.blue,
+              text: state.categories ? 'Categories' : 'Items',
+              color: state.categories ? Colors.red : Colors.blue,
               onFilterChange: () => context.read<FilterCubit>().toggleFilter(),
               onClear: () => context.read<FilterCubit>().cancelFilter(),
-              controller: state.controller!,
+              controller: state.controller,
             );
           },
         ),

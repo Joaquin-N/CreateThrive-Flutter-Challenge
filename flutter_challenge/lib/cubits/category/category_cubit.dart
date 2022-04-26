@@ -19,7 +19,7 @@ class CategoryCubit extends Cubit<CategoryState> {
     _loadCategory();
 
     filterStateStream.listen((filterState) async {
-      if (filterState is FilterFavorites) {
+      if (filterState.favorites) {
         await Future.delayed(Duration(milliseconds: 1));
         for (ItemCubit cubit in state.itemCubits) {
           if (cubit.state is! ItemNotShowing) {
@@ -28,10 +28,10 @@ class CategoryCubit extends Cubit<CategoryState> {
           }
         }
         _hide();
-      } else if (filterState is FilterDisabled) {
+      } else if (!filterState.enabled) {
         _show();
-      } else if (filterState is FilterCategories) {
-        if (state.category.name.startsWith(filterState.filter)) {
+      } else if (filterState.categories) {
+        if (state.category.name.startsWith(filterState.value)) {
           _show();
         } else {
           _hide();
