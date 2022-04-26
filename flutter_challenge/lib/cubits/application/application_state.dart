@@ -1,7 +1,7 @@
 part of 'application_cubit.dart';
 
 @immutable
-abstract class ApplicationState {
+class ApplicationState {
   final String title;
   const ApplicationState(this.title);
 }

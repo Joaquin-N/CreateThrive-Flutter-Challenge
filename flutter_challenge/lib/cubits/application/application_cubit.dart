@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter_challenge/constants.dart';
 import 'package:meta/meta.dart';
 
 part 'application_state.dart';

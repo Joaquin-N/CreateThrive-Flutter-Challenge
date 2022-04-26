@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_challenge/constants.dart';
 import 'package:flutter_challenge/cubits/data/data_cubit.dart';
 import 'package:flutter_challenge/cubits/category/category_cubit.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
@@ -18,7 +19,7 @@ class ShoppingListPage extends StatelessWidget {
           builder: (context, state) {
             return FilteringBar(
               text: state.categories ? 'Categories' : 'Items',
-              color: state.categories ? Colors.red : Colors.blue,
+              color: state.categories ? categoryColor : itemColor,
               onFilterChange: () => context.read<FilterCubit>().toggleFilter(),
               onClear: () => context.read<FilterCubit>().cancelFilter(),
               controller: state.controller,

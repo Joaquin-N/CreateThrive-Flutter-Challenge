@@ -5,12 +5,12 @@ class FilterButton extends StatelessWidget {
       {Key? key,
       required this.text,
       required this.color,
-      required this.onPressed,
+      this.onPressed,
       this.minWidth = 95.0,
       this.minHeight = 35.0})
       : super(key: key);
 
-  final Function() onPressed;
+  final Function()? onPressed;
   final String text;
   final Color color;
   final double minWidth;
@@ -25,6 +25,7 @@ class FilterButton extends StatelessWidget {
         shape: StadiumBorder(),
       ).copyWith(
         backgroundColor: MaterialStateProperty.all<Color>(color),
+        foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
         minimumSize: MaterialStateProperty.all(Size(minWidth, minHeight)),
       ),
     );
