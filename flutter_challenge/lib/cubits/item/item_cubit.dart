@@ -32,7 +32,9 @@ class ItemCubit extends Cubit<ItemState> {
   }
 
   void _loadItem() {
-    fs.getItem(itemId).listen((item) => _emitState(item));
+    fs.getItem(itemId).listen((item) {
+      _emitState(item);
+    });
   }
 
   void _emitState(Item item) {
@@ -48,5 +50,10 @@ class ItemCubit extends Cubit<ItemState> {
     }
     fs.updateItem(item);
     _emitState(item);
+  }
+
+  void delete() {
+    emit(ItemDeleted(state.item));
+    fs.deleteItem(state.item);
   }
 }

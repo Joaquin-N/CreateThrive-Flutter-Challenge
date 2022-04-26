@@ -21,3 +21,7 @@ class ItemNotFavorite extends ItemState {
 class ItemFavorite extends ItemState {
   const ItemFavorite(Item item) : super(item);
 }
+
+class ItemDeleted extends ItemState {
+  const ItemDeleted(Item item) : super(item);
+}

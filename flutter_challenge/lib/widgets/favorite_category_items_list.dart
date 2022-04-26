@@ -5,7 +5,7 @@ import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
 import 'package:flutter_challenge/cubits/item/item_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
-import 'package:flutter_challenge/widgets/Favorite_snack_bar.dart';
+import 'package:flutter_challenge/widgets/custom_snack_bar.dart';
 import 'package:intl/intl.dart';
 
 class FavoriteCategoryItemsList extends StatelessWidget {
@@ -68,19 +68,36 @@ class ItemListTile extends StatelessWidget {
     return BlocConsumer<ItemCubit, ItemState>(
       bloc: cubit,
       builder: (context, state) {
-        if (state is ItemNotShowing) return Container();
-        return ListTile(
-          title: Text(state.item.name),
-          subtitle: Text('Added on ' +
-              DateFormat('dd/MM/yyyy').format(state.item.favAddDate!)),
+        if (state is ItemNotShowing || state is ItemNotFavorite)
+          return Container();
+        //TODO do not rebuild on dismiss
+        return Dismissible(
+          key: Key('x$key'),
+          background: Container(color: Colors.yellow[200]),
+          direction: DismissDirection.endToStart,
+          confirmDismiss: (direction) {
+            if (direction == DismissDirection.endToStart) {
+              cubit.toggleFav();
+            }
+            return Future.value(true);
+          },
+          child: ListTile(
+            title: Text(state.item.name),
+            subtitle: Text('Added on ' +
+                DateFormat('dd/MM/yyyy').format(state.item.favAddDate!)),
+            trailing: IconButton(
+              onPressed: () => cubit.toggleFav(),
+              icon:
+                  Icon(state is ItemFavorite ? Icons.star : Icons.star_border),
+            ),
+          ),
         );
       },
       listenWhen: (oldState, newState) {
-        return (oldState is ItemFavorite && newState is ItemNotFavorite) ||
-            (oldState is ItemNotFavorite && newState is ItemFavorite);
+        return (oldState is ItemFavorite && newState is ItemNotFavorite);
       },
       listener: (context, state) {
-        ScaffoldMessenger.of(context).showSnackBar(FavoriteSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(CustomSnackBar(
             text:
                 'Item ${state.item.name} ${state is ItemFavorite ? "added to" : "removed from"} favorites'));
       },

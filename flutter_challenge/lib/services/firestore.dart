@@ -50,6 +50,7 @@ class Firestore {
         .map(((snap) => ItemCategory.fromSnapshot(snap)));
   }
 
+  // TODO check error on delete item
   Stream<Item> getItem(String docId) {
     return _items
         .doc(docId)
@@ -59,6 +60,24 @@ class Firestore {
 
   void updateItem(Item item) {
     _items.doc(item.id).update(item.toDocument());
+  }
+
+  void deleteItem(Item item) async {
+    String categoryId = await _categories
+        .where('items_doc', arrayContains: item.id)
+        .get()
+        .then((snap) => snap.docs.first.id);
+    await _removeItemFromCategory(item.id!, categoryId);
+    _items.doc(item.id!).delete();
+  }
+
+  Future _removeItemFromCategory(String itemId, String categoryId) async {
+    List itemsId = await _categories
+        .doc(categoryId)
+        .get()
+        .then((docSnap) => docSnap['items_doc'].toList());
+    itemsId.remove(itemId);
+    _categories.doc(categoryId).update({'items_doc': itemsId});
   }
 
   // Stream<QuerySnapshot<ItemCategory>> getCategories2() {

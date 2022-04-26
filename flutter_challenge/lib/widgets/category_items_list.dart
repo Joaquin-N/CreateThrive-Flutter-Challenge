@@ -5,7 +5,7 @@ import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
 import 'package:flutter_challenge/cubits/item/item_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
-import 'package:flutter_challenge/widgets/Favorite_snack_bar.dart';
+import 'package:flutter_challenge/widgets/custom_snack_bar.dart';
 
 class CategoryItemsList extends StatelessWidget {
   const CategoryItemsList({
@@ -20,7 +20,9 @@ class CategoryItemsList extends StatelessWidget {
       bloc: cubit,
       builder: (context, state) {
         ItemCategory category = state.category;
-        if (state is CategoryHide) return Container();
+        if (state is CategoryHide) {
+          return Container();
+        }
         return Container(
           color: Color(category.color).withOpacity(0.6),
           width: double.infinity,
@@ -84,36 +86,50 @@ class ItemListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ItemCubit, ItemState>(
-      bloc: cubit,
-      builder: (context, state) {
-        if (state is ItemNotShowing) return Container();
-        return ListTile(
-          onLongPress: () => print('edit'),
-          title: Text(state.item.name),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                  onPressed: () => cubit.toggleFav(),
-                  icon: Icon(
-                      state is ItemFavorite ? Icons.star : Icons.star_border)),
-              ReorderableDragStartListener(
-                index: index,
-                child: const Icon(Icons.drag_handle),
+        bloc: cubit,
+        builder: (context, state) {
+          if (state is ItemNotShowing) return Container();
+          return Dismissible(
+            key: Key('x$key'),
+            background: Container(color: Colors.yellow[200]),
+            secondaryBackground: Container(color: Colors.red[400]),
+            confirmDismiss: (direction) {
+              if (direction == DismissDirection.startToEnd) {
+                cubit.toggleFav();
+              } else {
+                cubit.delete();
+                return Future.value(false);
+              }
+              return Future.value(false);
+            },
+            child: ListTile(
+              onLongPress: () => print('edit'),
+              title: Text(state.item.name),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    onPressed: () => cubit.toggleFav(),
+                    icon: Icon(
+                        state is ItemFavorite ? Icons.star : Icons.star_border),
+                  ),
+                  ReorderableDragStartListener(
+                    index: index,
+                    child: const Icon(Icons.drag_handle),
+                  ),
+                ],
               ),
-            ],
-          ),
-        );
-      },
-      listenWhen: (oldState, newState) {
-        return (oldState is ItemFavorite && newState is ItemNotFavorite) ||
-            (oldState is ItemNotFavorite && newState is ItemFavorite);
-      },
-      listener: (context, state) {
-        ScaffoldMessenger.of(context).showSnackBar(FavoriteSnackBar(
-            text:
-                'Item ${state.item.name} ${state is ItemFavorite ? "added to" : "removed from"} favorites'));
-      },
-    );
+            ),
+          );
+        },
+        listenWhen: (oldState, newState) {
+          return (oldState is ItemFavorite && newState is ItemNotFavorite) ||
+              (oldState is ItemNotFavorite && newState is ItemFavorite);
+        },
+        listener: (context, state) {
+          ScaffoldMessenger.of(context).showSnackBar(CustomSnackBar(
+              text:
+                  'Item ${state.item.name} ${state is ItemFavorite ? "added to" : "removed from"} favorites'));
+        });
   }
 }

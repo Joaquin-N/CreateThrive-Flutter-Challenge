@@ -19,6 +19,8 @@ class CategoryCubit extends Cubit<CategoryState> {
     _loadCategory();
 
     filterStateStream.listen((filterState) async {
+      if (state.category.itemsId.isEmpty) return;
+
       if (filterState.favorites) {
         await Future.delayed(Duration(milliseconds: 1));
         for (ItemCubit cubit in state.itemCubits) {
@@ -99,6 +101,10 @@ class CategoryCubit extends Cubit<CategoryState> {
   void _loadCategory() {
     fs.getCategory(categoryId).listen((category) {
       // This statement prevents rebuilding the ui when items rearanged
+      if (category.itemsId.isEmpty) {
+        _hide();
+        return;
+      }
       if (category.itemsId.length == state.category.itemsId.length) return;
 
       List<ItemCubit> cubits = List.generate(

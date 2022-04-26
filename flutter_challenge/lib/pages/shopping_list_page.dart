@@ -69,7 +69,7 @@ class FilteringBar extends StatelessWidget {
           ),
           IconButton(
             onPressed: onClear,
-            icon: Icon(Icons.cancel_outlined),
+            icon: Icon(Icons.cancel_rounded, color: Colors.grey),
           ),
         ],
       ),
