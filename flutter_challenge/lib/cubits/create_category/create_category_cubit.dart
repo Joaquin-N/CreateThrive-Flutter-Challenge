@@ -27,6 +27,7 @@ class CreateCategoryCubit extends Cubit<CreateCategoryState> {
       return;
     }
     fs.saveCategory(category);
+    emit(state.toSaved());
     emit(CreateCategoryInitial(category: ItemCategory.empty()));
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_challenge/constants.dart';
 import 'package:flutter_challenge/cubits/create_item/create_item_cubit.dart';
+import 'package:flutter_challenge/pages/widgets/custom_snack_bar.dart';
 import 'package:flutter_challenge/pages/widgets/custom_text_field.dart';
 
 class CreateItemPage extends StatelessWidget {
@@ -11,7 +12,7 @@ class CreateItemPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CreateItemCubit, CreateItemState>(
+    return BlocConsumer<CreateItemCubit, CreateItemState>(
       builder: (context, state) {
         final cubit = context.read<CreateItemCubit>();
         return Column(
@@ -22,6 +23,7 @@ class CreateItemPage extends StatelessWidget {
               children: [
                 Text('Name', style: defaultTextStyle),
                 CustomTextField(
+                  //TODO check not clearing after saving
                   initialText: state.item.name,
                   onChanged: (value) => cubit.update(name: value),
                 ),
@@ -97,6 +99,11 @@ class CreateItemPage extends StatelessWidget {
             ),
           ],
         );
+      },
+      listenWhen: (oldState, newState) => newState is CreateItemSaved,
+      listener: (context, state) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackBar(text: 'Item ${state.item.name} created'));
       },
     );
   }

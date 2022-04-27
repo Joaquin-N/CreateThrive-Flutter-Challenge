@@ -32,6 +32,12 @@ class Firestore {
             snap.docs.map((docSnap) => Item.fromSnapshot(docSnap)).toList());
   }
 
+  Stream<List<String>> getCategoriesNames() {
+    return _categories
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => doc['name'] as String).toList());
+  }
+
   Stream<List<ItemCategory>> getCategories() {
     return _categories.snapshots().map((snapshot) =>
         snapshot.docs.map((doc) => ItemCategory.fromSnapshot(doc)).toList());
@@ -71,6 +77,15 @@ class Firestore {
     _items.doc(item.id).delete();
   }
 
+  Future _addItemToCategory(String itemId, String categoryId) async {
+    List itemsId = await _categories
+        .doc(categoryId)
+        .get()
+        .then((docSnap) => docSnap['items_doc'].toList());
+    itemsId.add(itemId);
+    _categories.doc(categoryId).update({'items_doc': itemsId});
+  }
+
   Future _removeItemFromCategory(String itemId, String categoryId) async {
     List itemsId = await _categories
         .doc(categoryId)
@@ -103,6 +118,13 @@ class Firestore {
     if (await checkItemDuplicated(item)) return false;
     var doc = await _items.add(item.toDocument());
     item.id = doc.id;
+
+    String categoryId = await _categories
+        .where('name', isEqualTo: item.category)
+        .get()
+        .then((value) => value.docs.first.id);
+    _addItemToCategory(item.id, categoryId);
+
     return true;
   }
 
@@ -123,27 +145,30 @@ class Firestore {
   }
 
   Future<void> fillData() async {
-    Item item1 = Item.empty()..name = 'item1';
-    Item item2 = Item.empty()..name = 'item2';
-    Item item3 = Item.empty()..name = 'item3';
-
-    await addItem(item1);
-    await addItem(item2);
-    await addItem(item3);
-
     ItemCategory cat1 = ItemCategory.empty()
       ..name = 'cat1'
       ..color = Colors.red.value;
-    cat1.addItemId(item1.id);
 
     ItemCategory cat2 = ItemCategory.empty()
       ..name = 'cat2'
       ..color = Colors.blue.value;
-    cat2.addItemId(item2.id);
-    cat2.addItemId(item3.id);
 
-    addCategory(cat1);
-    addCategory(cat2);
+    await addCategory(cat1);
+    await addCategory(cat2);
+
+    Item item1 = Item.empty()
+      ..name = 'item1'
+      ..category = cat1.name;
+    Item item2 = Item.empty()
+      ..name = 'item2'
+      ..category = cat1.name;
+    Item item3 = Item.empty()
+      ..name = 'item3'
+      ..category = cat2.name;
+
+    await addItem(item1);
+    await addItem(item2);
+    await addItem(item3);
   }
 
   Future<bool> checkItemDuplicated(Item item) async {

@@ -10,9 +10,13 @@ class CreateItemCubit extends Cubit<CreateItemState> {
   Firestore fs = Firestore.instance;
   CreateItemCubit()
       : super(
-            CreateItemInitial(item: Item.empty(), categoriesNames: categories));
-
-  static List<String> categories = ['', 'cat1', 'cat2', 'cat3'];
+          CreateItemInitial(item: Item.empty(), categoriesNames: ['']),
+        ) {
+    fs.getCategoriesNames().listen((categories) {
+      emit(CreateItemInitial(
+          item: state.item, categoriesNames: ['', ...categories]));
+    });
+  }
 
   void update({String? name, String? category, String? image}) {
     if (name != null) state.item.name = name;
@@ -54,6 +58,8 @@ class CreateItemCubit extends Cubit<CreateItemState> {
       return;
     }
     fs.saveItem(item);
-    emit(CreateItemInitial(item: Item.empty(), categoriesNames: categories));
+    emit(state.toSaved());
+    emit(CreateItemInitial(
+        item: Item.empty(), categoriesNames: state.categoriesNames));
   }
 }

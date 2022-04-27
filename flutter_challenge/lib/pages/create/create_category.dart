@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_challenge/constants.dart';
 import 'package:flutter_challenge/cubits/create_category/create_category_cubit.dart';
+import 'package:flutter_challenge/pages/widgets/custom_snack_bar.dart';
 import 'package:flutter_challenge/pages/widgets/custom_text_field.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
@@ -10,7 +11,7 @@ class CreateCategoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CreateCategoryCubit, CreateCategoryState>(
+    return BlocConsumer<CreateCategoryCubit, CreateCategoryState>(
       builder: (context, state) {
         final cubit = context.read<CreateCategoryCubit>();
         return Column(
@@ -52,6 +53,11 @@ class CreateCategoryPage extends StatelessWidget {
                 child: Text('Create Category'))
           ],
         );
+      },
+      listenWhen: (oldState, newState) => newState is CreateCategorySaved,
+      listener: (context, state) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackBar(text: 'Category ${state.category.name} created'));
       },
     );
   }

@@ -6,6 +6,7 @@ import 'package:flutter_challenge/cubits/item/item_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
 import 'package:flutter_challenge/pages/widgets/custom_snack_bar.dart';
+import 'package:flutter_challenge/pages/widgets/delete_dialog.dart';
 
 class CategoryItemsList extends StatelessWidget {
   const CategoryItemsList({
@@ -93,12 +94,19 @@ class ItemListTile extends StatelessWidget {
             key: Key('x$key'),
             background: Container(color: Colors.yellow[200]),
             secondaryBackground: Container(color: Colors.red[400]),
-            confirmDismiss: (direction) {
+            // TODO sync dismiss with rebuild
+            confirmDismiss: (direction) async {
               if (direction == DismissDirection.startToEnd) {
                 cubit.toggleFav();
               } else {
-                cubit.delete();
-                return Future.value(false);
+                bool? answer = await showDialog(
+                    context: context,
+                    builder: (context) => DeleteDialog(
+                          itemName: state.item.name,
+                        ));
+                if (answer != null && answer) {
+                  cubit.delete();
+                }
               }
               return Future.value(false);
             },

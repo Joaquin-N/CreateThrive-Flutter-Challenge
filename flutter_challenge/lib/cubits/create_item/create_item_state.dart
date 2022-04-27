@@ -11,6 +11,7 @@ abstract class CreateItemState {
 
   CreateItemUpdated toUpdated() => CreateItemUpdated._(this);
   CreateItemReady toReady() => CreateItemReady._(this);
+  CreateItemSaved toSaved() => CreateItemSaved._(this);
   CreateItemErrorDuplicated toErrorDuplicated() =>
       CreateItemErrorDuplicated._(this);
 }
@@ -27,6 +28,10 @@ class CreateItemUpdated extends CreateItemState {
 
 class CreateItemReady extends CreateItemState {
   CreateItemReady._(CreateItemState state) : super._(state);
+}
+
+class CreateItemSaved extends CreateItemState {
+  CreateItemSaved._(CreateItemState state) : super._(state);
 }
 
 class CreateItemErrorDuplicated extends CreateItemState {

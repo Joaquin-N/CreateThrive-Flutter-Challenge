@@ -8,6 +8,7 @@ abstract class CreateCategoryState {
 
   CreateCategoryUpdated toUpdated() => CreateCategoryUpdated._(this);
   CreateCategoryReady toReady() => CreateCategoryReady._(this);
+  CreateCategorySaved toSaved() => CreateCategorySaved._(this);
   CreateCategoryErrorDuplicated toErrorDuplicated() =>
       CreateCategoryErrorDuplicated._(this);
 }
@@ -19,6 +20,10 @@ class CreateCategoryInitial extends CreateCategoryState {
 
 class CreateCategoryUpdated extends CreateCategoryState {
   CreateCategoryUpdated._(CreateCategoryState state) : super._(state);
+}
+
+class CreateCategorySaved extends CreateCategoryState {
+  CreateCategorySaved._(CreateCategoryState state) : super._(state);
 }
 
 class CreateCategoryReady extends CreateCategoryState {
