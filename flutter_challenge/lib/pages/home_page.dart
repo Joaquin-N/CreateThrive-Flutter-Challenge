@@ -33,6 +33,7 @@ class HomePage extends StatelessWidget {
             drawer: Builder(builder: (context) {
               return Drawer(
                 child: Column(children: [
+                  DrawerHeader(child: Container()),
                   TextButton(
                     onPressed: () {
                       context.read<ApplicationCubit>().toShoppingList();

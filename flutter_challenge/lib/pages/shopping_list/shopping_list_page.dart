@@ -82,16 +82,28 @@ class FilteringBar extends StatelessWidget {
               onChanged: onTextChange,
               decoration: InputDecoration(
                 hintText: 'Search',
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    final FocusScopeNode currentScope = FocusScope.of(context);
+                    if (!currentScope.hasPrimaryFocus &&
+                        currentScope.hasFocus) {
+                      FocusManager.instance.primaryFocus!.unfocus();
+                    }
+                    controller.clear();
+                    onClear();
+                  },
+                  icon: Icon(Icons.clear),
+                ),
               ),
             ),
           ),
-          IconButton(
-            onPressed: () {
-              controller.clear();
-              onClear();
-            },
-            icon: Icon(Icons.cancel_rounded, color: Colors.grey),
-          ),
+          // IconButton(
+          //   onPressed: () {
+          //     controller.clear();
+          //     onClear();
+          //   },
+          //   icon: Icon(Icons.cancel_rounded, color: Colors.grey),
+          // ),
         ],
       ),
     );

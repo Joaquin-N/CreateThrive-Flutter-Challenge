@@ -39,7 +39,7 @@ class FilterCubit extends Cubit<FilterState> {
   }
 
   void _disable() {
-    emit(state.copyWith(value: 'zsfda', enabled: false, favorites: false));
+    emit(state.copyWith(value: '', enabled: false, favorites: false));
   }
 
   void _filter(String value) {
