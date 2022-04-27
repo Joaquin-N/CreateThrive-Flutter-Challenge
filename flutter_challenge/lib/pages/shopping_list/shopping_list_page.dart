@@ -4,9 +4,9 @@ import 'package:flutter_challenge/constants.dart';
 import 'package:flutter_challenge/cubits/data/data_cubit.dart';
 import 'package:flutter_challenge/cubits/category/category_cubit.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
-import 'package:flutter_challenge/widgets/category_items_list.dart';
-import 'package:flutter_challenge/widgets/filter_button.dart';
-import 'package:flutter_challenge/widgets/items_list.dart';
+import 'package:flutter_challenge/pages/shopping_list/category_items_list.dart';
+import 'package:flutter_challenge/pages/widgets/filter_button.dart';
+import 'package:flutter_challenge/pages/widgets/items_list.dart';
 
 class ShoppingListPage extends StatelessWidget {
   const ShoppingListPage({Key? key}) : super(key: key);

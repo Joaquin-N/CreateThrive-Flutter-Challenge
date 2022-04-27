@@ -9,7 +9,7 @@ abstract class CategoryState {
 }
 
 class LoadingCategory extends CategoryState {
-  LoadingCategory() : super(ItemCategory(), []);
+  LoadingCategory() : super(ItemCategory.empty(), []);
 }
 
 class CategoryHide extends CategoryState {

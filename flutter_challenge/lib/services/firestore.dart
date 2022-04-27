@@ -67,8 +67,8 @@ class Firestore {
         .where('items_doc', arrayContains: item.id)
         .get()
         .then((snap) => snap.docs.first.id);
-    await _removeItemFromCategory(item.id!, categoryId);
-    _items.doc(item.id!).delete();
+    await _removeItemFromCategory(item.id, categoryId);
+    _items.doc(item.id).delete();
   }
 
   Future _removeItemFromCategory(String itemId, String categoryId) async {
@@ -88,7 +88,7 @@ class Firestore {
   // }
 
   Future<bool> addCategory(ItemCategory cat) async {
-    if (await _checkCategoryExistence(cat.name)) return false;
+    if (await checkCategoryDuplicated(cat)) return false;
     var doc = await _categories.add(cat.toDocument());
     cat.id = doc.id;
     return true;
@@ -100,43 +100,68 @@ class Firestore {
   }
 
   Future<bool> addItem(Item item) async {
-    if (await _checkItemExistence(item.name)) return false;
+    if (await checkItemDuplicated(item)) return false;
     var doc = await _items.add(item.toDocument());
     item.id = doc.id;
     return true;
   }
 
+  void saveItem(Item item) {
+    if (item.id == '') {
+      addItem(item);
+    } else {
+      _items.doc(item.id).update(item.toDocument());
+    }
+  }
+
+  void saveCategory(ItemCategory category) {
+    if (category.id == '') {
+      addCategory(category);
+    } else {
+      updateCategory(category);
+    }
+  }
+
   Future<void> fillData() async {
-    Item item1 = Item(name: 'item1');
-    Item item2 = Item(name: 'item2');
-    Item item3 = Item(name: 'item3');
+    Item item1 = Item.empty()..name = 'item1';
+    Item item2 = Item.empty()..name = 'item2';
+    Item item3 = Item.empty()..name = 'item3';
 
     await addItem(item1);
     await addItem(item2);
     await addItem(item3);
 
-    ItemCategory cat1 = ItemCategory(name: 'cat1', color: Colors.red.value);
-    cat1.addItemId(item1.id!);
+    ItemCategory cat1 = ItemCategory.empty()
+      ..name = 'cat1'
+      ..color = Colors.red.value;
+    cat1.addItemId(item1.id);
 
-    ItemCategory cat2 = ItemCategory(name: 'cat2', color: Colors.blue.value);
-    cat2.addItemId(item2.id!);
-    cat2.addItemId(item3.id!);
+    ItemCategory cat2 = ItemCategory.empty()
+      ..name = 'cat2'
+      ..color = Colors.blue.value;
+    cat2.addItemId(item2.id);
+    cat2.addItemId(item3.id);
 
     addCategory(cat1);
     addCategory(cat2);
   }
 
-  Future<bool> _checkItemExistence(String name) async {
-    return await _items
-        .where('name', isEqualTo: name)
-        .get()
-        .then((value) => value.size != 0);
+  Future<bool> checkItemDuplicated(Item item) async {
+    return await _items.where('name', isEqualTo: item.name).get().then((snap) {
+      if (snap.size == 0) return false;
+      if (snap.size == 1 && snap.docs.first.id == item.id) return false;
+      return true;
+    });
   }
 
-  Future<bool> _checkCategoryExistence(String name) async {
+  Future<bool> checkCategoryDuplicated(ItemCategory category) async {
     return await _categories
-        .where('name', isEqualTo: name)
+        .where('name', isEqualTo: category.name)
         .get()
-        .then((value) => value.size != 0);
+        .then((snap) {
+      if (snap.size == 0) return false;
+      if (snap.size == 1 && snap.docs.first.id == category.id) return false;
+      return true;
+    });
   }
 }

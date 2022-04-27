@@ -7,7 +7,7 @@ abstract class ItemState {
 }
 
 class ItemLoading extends ItemState {
-  ItemLoading() : super(Item(name: ''));
+  ItemLoading() : super(Item.empty());
 }
 
 class ItemNotShowing extends ItemState {

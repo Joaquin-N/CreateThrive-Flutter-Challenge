@@ -1,21 +1,24 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter_challenge/constants.dart';
 import 'package:meta/meta.dart';
 
 part 'application_state.dart';
 
 class ApplicationCubit extends Cubit<ApplicationState> {
-  ApplicationCubit() : super(ApplicationShoppingList());
+  ApplicationCubit() : super(const ApplicationInitial().toCreateItem());
 
   void toShoppingList() {
-    emit(ApplicationShoppingList());
+    emit(state.toShoppingList());
   }
 
   void toFavorites() {
-    emit(ApplicationFavorites());
+    emit(state.toFavorites());
   }
 
   void toCreate() {
-    emit(ApplicationCreate());
+    emit(state.toCreateItem());
+  }
+
+  void switchCreate(bool category) {
+    emit(category ? state.toCreateCategory() : state.toCreateItem());
   }
 }

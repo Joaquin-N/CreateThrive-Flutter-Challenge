@@ -5,7 +5,7 @@ import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
 import 'package:flutter_challenge/cubits/item/item_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
-import 'package:flutter_challenge/widgets/custom_snack_bar.dart';
+import 'package:flutter_challenge/pages/widgets/custom_snack_bar.dart';
 
 class CategoryItemsList extends StatelessWidget {
   const CategoryItemsList({
@@ -20,7 +20,7 @@ class CategoryItemsList extends StatelessWidget {
       bloc: cubit,
       builder: (context, state) {
         ItemCategory category = state.category;
-        if (state is CategoryHide) {
+        if (state is CategoryHide || state is LoadingCategory) {
           return Container();
         }
         return Container(

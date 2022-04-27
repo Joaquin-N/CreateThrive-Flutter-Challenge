@@ -3,14 +3,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_challenge/models/item.dart';
 
 class ItemCategory {
-  String? id;
+  String id;
   String name;
   int color;
   List<String> itemsId = [];
 
   //List<Item> _items = [];
 
-  ItemCategory({this.name = '', this.color = 0});
+  ItemCategory({required this.id, required this.name, required this.color});
+
+  ItemCategory.empty()
+      : id = '',
+        name = '',
+        color = -1;
+  bool validate() => name != '' && color != -1;
 
   void addItemId(String id) {
     itemsId.add(id);

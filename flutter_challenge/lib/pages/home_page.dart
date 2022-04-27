@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_challenge/cubits/application/application_cubit.dart';
-import 'package:flutter_challenge/cubits/create/create_cubit.dart';
+import 'package:flutter_challenge/cubits/create_category/create_category_cubit.dart';
+import 'package:flutter_challenge/cubits/create_item/create_item_cubit.dart';
 import 'package:flutter_challenge/cubits/data/data_cubit.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
-import 'package:flutter_challenge/pages/create_page.dart';
-import 'package:flutter_challenge/pages/favorites_page.dart';
-import 'package:flutter_challenge/pages/shopping_list_page.dart';
+import 'package:flutter_challenge/pages/create/create_page.dart';
+import 'package:flutter_challenge/pages/favorites/favorites_page.dart';
+import 'package:flutter_challenge/pages/shopping_list/shopping_list_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -22,7 +23,8 @@ class HomePage extends StatelessWidget {
             lazy: false),
         BlocProvider(
             create: (context) => DataCubit(context.read<FilterCubit>().stream)),
-        BlocProvider(create: (_) => CreateCubit())
+        BlocProvider(create: (_) => CreateItemCubit()),
+        BlocProvider(create: (_) => CreateCategoryCubit()),
       ],
       child: BlocBuilder<ApplicationCubit, ApplicationState>(
         builder: (context, state) {

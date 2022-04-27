@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_challenge/cubits/data/data_cubit.dart';
-import 'package:flutter_challenge/widgets/category_items_list.dart';
-import 'package:flutter_challenge/widgets/favorite_category_items_list.dart';
+import 'package:flutter_challenge/pages/shopping_list/category_items_list.dart';
+import 'package:flutter_challenge/pages/favorites/favorite_category_items_list.dart';
 
 class ItemsList extends StatelessWidget {
   const ItemsList({

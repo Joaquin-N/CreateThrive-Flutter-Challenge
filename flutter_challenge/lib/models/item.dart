@@ -2,13 +2,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_challenge/models/item_category.dart';
 
 class Item {
-  String? id;
+  String id;
   String name;
-  String? category;
   DateTime? favAddDate;
-  String? imgUrl;
+  String imgUrl;
 
-  Item({this.name = ''});
+  String? category;
+  String? localImgPath;
+
+  Item(
+      {required this.id,
+      required this.name,
+      required this.favAddDate,
+      required this.imgUrl});
+
+  Item.empty()
+      : id = '',
+        name = '',
+        imgUrl = '';
+  bool validate() => name != '' && category != null && localImgPath != null;
 
   // Item copyWith({String? name, String? imgUrl}) {
   //   return Item(
