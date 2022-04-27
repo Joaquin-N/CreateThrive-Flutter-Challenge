@@ -8,13 +8,15 @@ import 'package:flutter_challenge/pages/widgets/custom_snack_bar.dart';
 import 'package:flutter_challenge/pages/widgets/custom_text_field.dart';
 
 class CreateItemPage extends StatelessWidget {
-  const CreateItemPage({Key? key}) : super(key: key);
+  final TextEditingController tec;
+  const CreateItemPage({Key? key, required this.tec}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CreateItemCubit, CreateItemState>(
       builder: (context, state) {
         final cubit = context.read<CreateItemCubit>();
+
         return Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -23,8 +25,7 @@ class CreateItemPage extends StatelessWidget {
               children: [
                 Text('Name', style: defaultTextStyle),
                 CustomTextField(
-                  //TODO check not clearing after saving
-                  initialText: state.item.name,
+                  controller: tec,
                   onChanged: (value) => cubit.update(name: value),
                 ),
               ],
@@ -102,6 +103,7 @@ class CreateItemPage extends StatelessWidget {
       },
       listenWhen: (oldState, newState) => newState is CreateItemSaved,
       listener: (context, state) {
+        tec.clear();
         ScaffoldMessenger.of(context).showSnackBar(
             CustomSnackBar(text: 'Item ${state.item.name} created'));
       },

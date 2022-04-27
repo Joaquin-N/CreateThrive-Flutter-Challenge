@@ -2,25 +2,20 @@ part of 'filter_cubit.dart';
 
 @immutable
 class FilterState {
-  final TextEditingController controller;
+  final String value;
   final bool enabled;
   final bool categories;
   final bool favorites;
   const FilterState(
-      {required this.controller,
+      {this.value = '',
       this.enabled = false,
       this.categories = false,
       this.favorites = false});
 
-  String get value => controller.text;
-
   FilterState copyWith(
-      {TextEditingController? controller,
-      bool? enabled,
-      bool? categories,
-      bool? favorites}) {
+      {String? value, bool? enabled, bool? categories, bool? favorites}) {
     return FilterState(
-        controller: controller ?? this.controller,
+        value: value ?? this.value,
         enabled: enabled ?? this.enabled,
         categories: categories ?? this.categories,
         favorites: favorites ?? this.favorites);

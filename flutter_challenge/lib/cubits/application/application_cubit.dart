@@ -4,7 +4,7 @@ import 'package:meta/meta.dart';
 part 'application_state.dart';
 
 class ApplicationCubit extends Cubit<ApplicationState> {
-  ApplicationCubit() : super(const ApplicationInitial().toCreateItem());
+  ApplicationCubit() : super(const ApplicationInitial().toShoppingList());
 
   void toShoppingList() {
     emit(state.toShoppingList());

@@ -7,13 +7,15 @@ import 'package:flutter_challenge/pages/widgets/custom_text_field.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class CreateCategoryPage extends StatelessWidget {
-  const CreateCategoryPage({Key? key}) : super(key: key);
+  final TextEditingController tec;
+  const CreateCategoryPage({Key? key, required this.tec}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CreateCategoryCubit, CreateCategoryState>(
       builder: (context, state) {
         final cubit = context.read<CreateCategoryCubit>();
+
         return Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -25,7 +27,7 @@ class CreateCategoryPage extends StatelessWidget {
                   style: defaultTextStyle,
                 ),
                 CustomTextField(
-                  initialText: state.category.name,
+                  controller: tec,
                   onChanged: (value) => cubit.update(name: value),
                 ),
               ],
@@ -56,6 +58,7 @@ class CreateCategoryPage extends StatelessWidget {
       },
       listenWhen: (oldState, newState) => newState is CreateCategorySaved,
       listener: (context, state) {
+        tec.clear();
         ScaffoldMessenger.of(context).showSnackBar(
             CustomSnackBar(text: 'Category ${state.category.name} created'));
       },

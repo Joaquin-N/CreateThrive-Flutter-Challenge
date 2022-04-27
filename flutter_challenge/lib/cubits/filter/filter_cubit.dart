@@ -6,24 +6,19 @@ part 'filter_state.dart';
 
 class FilterCubit extends Cubit<FilterState> {
   final Stream<ApplicationState> applicationStateStream;
-  FilterCubit(this.applicationStateStream)
-      : super(FilterState(controller: TextEditingController())) {
-    state.controller.addListener(() {
-      _search();
-    });
+  FilterCubit(this.applicationStateStream) : super(FilterState()) {
     applicationStateStream.listen((appState) {
       if (appState is ApplicationShoppingList)
-        _search();
+        search(state.value);
       else if (appState is ApplicationFavorites) _favorites();
     });
   }
 
-  void _search() {
-    String value = state.controller.text;
+  void search(String value) {
     if (value == '') {
       _disable();
     } else {
-      _filter();
+      _filter(value);
     }
   }
 
@@ -44,10 +39,10 @@ class FilterCubit extends Cubit<FilterState> {
   }
 
   void _disable() {
-    emit(state.copyWith(enabled: false, favorites: false));
+    emit(state.copyWith(value: 'zsfda', enabled: false, favorites: false));
   }
 
-  void _filter() {
-    emit(state.copyWith(enabled: true, favorites: false));
+  void _filter(String value) {
+    emit(state.copyWith(value: value, enabled: true, favorites: false));
   }
 }

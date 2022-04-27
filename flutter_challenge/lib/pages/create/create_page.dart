@@ -6,8 +6,23 @@ import 'package:flutter_challenge/pages/create/create_category.dart';
 import 'package:flutter_challenge/pages/create/create_item.dart';
 import 'package:flutter_challenge/pages/widgets/filter_button.dart';
 
-class CreatePage extends StatelessWidget {
+class CreatePage extends StatefulWidget {
   const CreatePage({Key? key}) : super(key: key);
+
+  @override
+  State<CreatePage> createState() => _CreatePageState();
+}
+
+class _CreatePageState extends State<CreatePage> {
+  final TextEditingController itemTec = TextEditingController();
+  final TextEditingController categoryTec = TextEditingController();
+
+  @override
+  void dispose() {
+    itemTec.dispose();
+    categoryTec.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +59,9 @@ class CreatePage extends StatelessWidget {
                     hasScrollBody: false,
                     child: Padding(
                       padding: EdgeInsets.only(bottom: 10.0, top: 20.0),
-                      child:
-                          switchValue ? CreateCategoryPage() : CreateItemPage(),
+                      child: switchValue
+                          ? CreateCategoryPage(tec: itemTec)
+                          : CreateItemPage(tec: categoryTec),
                     ),
                   )
                 ],
