@@ -22,6 +22,13 @@ class ItemCategory {
     itemsId.add(id);
   }
 
+  bool hasSameProperties(ItemCategory other) {
+    return id == other.id &&
+        name == other.name &&
+        color == other.color &&
+        itemsId.length == other.itemsId.length;
+  }
+
   // set items(List<Item> values) {
   //   _items.clear();
   //   for (String doc in docs) {

@@ -22,6 +22,8 @@ class Item {
         imgUrl = '';
   bool validate() => name != '' && category != null && localImgPath != null;
 
+  bool isFavorite() => favAddDate != null;
+
   // Item copyWith({String? name, String? imgUrl}) {
   //   return Item(
   //       id: id,

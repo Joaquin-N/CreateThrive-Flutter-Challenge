@@ -56,6 +56,13 @@ class Firestore {
         .map(((snap) => ItemCategory.fromSnapshot(snap)));
   }
 
+  Stream<ItemCategory> getCategoryUpdates(ItemCategory category) {
+    return _categories
+        .doc(category.id)
+        .snapshots()
+        .map(((snap) => ItemCategory.fromSnapshot(snap)));
+  }
+
   // TODO check error on delete item
   Stream<Item> getItem(String docId) {
     return _items

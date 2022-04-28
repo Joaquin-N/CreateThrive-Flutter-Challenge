@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
@@ -10,45 +12,45 @@ import 'package:meta/meta.dart';
 part 'category_state.dart';
 
 class CategoryCubit extends Cubit<CategoryState> {
-  final String categoryId;
-  final Stream<FilterState> filterStateStream;
   final fs = Firestore.instance;
+  StreamSubscription? categorySubscription;
+  StreamSubscription? itemsSubscription;
 
-  CategoryCubit({required this.categoryId, required this.filterStateStream})
-      : super(LoadingCategory()) {
+  CategoryCubit({required category}) : super(LoadingCategory(category)) {
     _loadCategory();
+    _loadItems();
 
-    filterStateStream.listen((filterState) async {
-      if (state.category.itemsId.isEmpty) return;
+    // filterStateStream.listen((filterState) async {
+    //   if (state.category.itemsId.isEmpty) return;
 
-      if (filterState.favorites) {
-        await Future.delayed(Duration(milliseconds: 1));
-        for (ItemCubit cubit in state.itemCubits) {
-          if (cubit.state is! ItemNotShowing) {
-            _show();
-            return;
-          }
-        }
-        _hide();
-      } else if (!filterState.enabled) {
-        _show();
-      } else if (filterState.categories) {
-        if (state.category.name.startsWith(filterState.value)) {
-          _show();
-        } else {
-          _hide();
-        }
-      } else {
-        await Future.delayed(Duration(milliseconds: 1));
-        for (ItemCubit cubit in state.itemCubits) {
-          if (cubit.state is! ItemNotShowing) {
-            _show();
-            return;
-          }
-        }
-        _hide();
-      }
-    });
+    //   if (filterState.favorites) {
+    //     await Future.delayed(Duration(milliseconds: 1));
+    //     for (ItemCubit cubit in state.items) {
+    //       if (cubit.state is! ItemNotShowing) {
+    //         _show();
+    //         return;
+    //       }
+    //     }
+    //     _hide();
+    //   } else if (!filterState.enabled) {
+    //     _show();
+    //   } else if (filterState.categories) {
+    //     if (state.category.name.startsWith(filterState.value)) {
+    //       _show();
+    //     } else {
+    //       _hide();
+    //     }
+    //   } else {
+    //     await Future.delayed(Duration(milliseconds: 1));
+    //     for (ItemCubit cubit in state.items) {
+    //       if (cubit.state is! ItemNotShowing) {
+    //         _show();
+    //         return;
+    //       }
+    //     }
+    //     _hide();
+    //   }
+    // });
   }
 
   void toggleShow() {
@@ -59,25 +61,20 @@ class CategoryCubit extends Cubit<CategoryState> {
     }
   }
 
-  void _show() {
-    if (state is CategoryHide) {
-      (state as CategoryHide).showItems ? _showItems() : _hideItems();
-    }
-  }
-
-  void _hide() {
-    if (state is! CategoryHide) {
-      emit(CategoryHide(
-          state.category, state.itemCubits, state is CategoryShowItems));
+  void applyFilter(String filter) {
+    if (filter != state.filter) {
+      emit(state is CategoryShowItems
+          ? CategoryShowItems(state.category, state.items, filter: filter)
+          : CategoryHideItems(state.category, state.items, filter: filter));
     }
   }
 
   void _showItems() {
-    emit(CategoryShowItems(state.category, state.itemCubits));
+    emit(CategoryShowItems(state.category, state.items));
   }
 
   void _hideItems() {
-    emit(CategoryHideItems(state.category, state.itemCubits));
+    emit(CategoryHideItems(state.category, state.items));
   }
 
   void reorder(oldIndex, newIndex) {
@@ -86,37 +83,43 @@ class CategoryCubit extends Cubit<CategoryState> {
     fs.updateCategory(category);
     // state update is handled locally to avoid delay
     _reorderCubits(oldIndex, newIndex);
-    emit(CategoryShowItems(category, state.itemCubits));
+    emit(CategoryShowItems(category, state.items));
   }
 
   void _reorderCubits(oldIndex, newIndex) {
-    List<ItemCubit> cubits = state.itemCubits;
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }
-    ItemCubit item = cubits.removeAt(oldIndex);
-    cubits.insert(newIndex, item);
+    Item item = state.items.removeAt(oldIndex);
+    state.items.insert(newIndex, item);
   }
 
   void _loadCategory() {
-    fs.getCategory(categoryId).listen((category) {
+    categorySubscription =
+        fs.getCategoryUpdates(state.category).listen((update) {
       // This statement prevents rebuilding the ui when items rearanged
-      if (category.itemsId.isEmpty) {
-        _hide();
-        return;
-      }
-      if (category.itemsId.length == state.category.itemsId.length) return;
+      if (state.category.hasSameProperties(update)) return;
+      emit(LoadingCategory(update));
+      _loadItems();
+    });
+  }
 
-      List<ItemCubit> cubits = List.generate(
-          category.itemsId.length,
-          (index) => ItemCubit(
-              itemId: category.itemsId[index],
-              filterStateStream: filterStateStream));
+  void _loadItems() {
+    if (itemsSubscription != null) itemsSubscription!.cancel();
+
+    itemsSubscription = fs.getCategoryItems(state.category).listen((items) {
       if (state is CategoryHideItems) {
-        emit(CategoryHideItems(category, cubits));
+        emit(CategoryHideItems(state.category, items));
       } else {
-        emit(CategoryShowItems(category, cubits));
+        emit(CategoryShowItems(state.category, items));
       }
     });
+  }
+
+  @override
+  Future<void> close() {
+    itemsSubscription?.cancel();
+    categorySubscription?.cancel();
+    return super.close();
   }
 }

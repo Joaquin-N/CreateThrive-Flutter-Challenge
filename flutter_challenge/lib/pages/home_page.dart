@@ -17,12 +17,8 @@ class HomePage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => ApplicationCubit(), lazy: false),
-        BlocProvider(
-            create: (context) =>
-                FilterCubit(context.read<ApplicationCubit>().stream),
-            lazy: false),
-        BlocProvider(
-            create: (context) => DataCubit(context.read<FilterCubit>().stream)),
+        BlocProvider(create: (_) => FilterCubit(), lazy: false),
+        BlocProvider(create: (_) => DataCubit()),
         BlocProvider(create: (_) => CreateItemCubit()),
         BlocProvider(create: (_) => CreateCategoryCubit()),
       ],

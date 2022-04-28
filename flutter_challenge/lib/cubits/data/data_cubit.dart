@@ -10,10 +10,9 @@ part 'data_state.dart';
 
 class DataCubit extends Cubit<DataState> {
   final fs = Firestore.instance;
-  final Stream<FilterState> filterStateStream;
   //final FilterCubit filterCubit;
 
-  DataCubit(this.filterStateStream) : super(DataLoading()) {
+  DataCubit() : super(DataLoading()) {
     _loadCategories();
   }
 
@@ -21,17 +20,19 @@ class DataCubit extends Cubit<DataState> {
   //   category.toggleShow();
   //   emit(AppReady(categories));
   // }
-
+// TODO cancel subscriptions
   void _loadCategories() {
-    fs.getCategoriesIds().listen((event) {
-      if (state.categoryCubits.length != event.length) {
-        emit(DataReady(List.generate(
-            event.length,
-            (index) => CategoryCubit(
-                categoryId: event[index],
-                filterStateStream: filterStateStream))));
+    fs.getCategories().listen((event) {
+      if (state.categories.length != event.length) {
+        emit(DataReady(event));
       }
     });
+  }
+
+  void applyFilter(String filter) {
+    if (filter != state.filter) {
+      emit(DataReady(state.categories, filter: filter));
+    }
   }
 
   // void _loadItems() {

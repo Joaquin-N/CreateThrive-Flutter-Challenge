@@ -40,7 +40,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
             );
           },
         ),
-        ItemsList(),
+        Expanded(child: ItemsList()),
       ],
     );
   }

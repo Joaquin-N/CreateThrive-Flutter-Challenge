@@ -5,14 +5,7 @@ import 'package:flutter_challenge/cubits/application/application_cubit.dart';
 part 'filter_state.dart';
 
 class FilterCubit extends Cubit<FilterState> {
-  final Stream<ApplicationState> applicationStateStream;
-  FilterCubit(this.applicationStateStream) : super(FilterState()) {
-    applicationStateStream.listen((appState) {
-      if (appState is ApplicationShoppingList)
-        search(state.value);
-      else if (appState is ApplicationFavorites) _favorites();
-    });
-  }
+  FilterCubit() : super(FilterState());
 
   void search(String value) {
     if (value == '') {
@@ -22,15 +15,17 @@ class FilterCubit extends Cubit<FilterState> {
     }
   }
 
-  void _favorites() {
-    emit(state.copyWith(favorites: true));
-  }
-
   void toggleFilter() {
     if (state.categories) {
-      emit(state.copyWith(categories: false));
+      emit(FilterState(
+          categories: false,
+          itemFilter: state.categoryFilter,
+          categoryFilter: state.itemFilter));
     } else {
-      emit(state.copyWith(categories: true));
+      emit(FilterState(
+          categories: true,
+          itemFilter: state.categoryFilter,
+          categoryFilter: state.itemFilter));
     }
   }
 
@@ -39,10 +34,14 @@ class FilterCubit extends Cubit<FilterState> {
   }
 
   void _disable() {
-    emit(state.copyWith(value: '', enabled: false, favorites: false));
+    emit(FilterState(categories: state.categories));
   }
 
   void _filter(String value) {
-    emit(state.copyWith(value: value, enabled: true, favorites: false));
+    if (state.categories) {
+      emit(FilterState(categories: state.categories, categoryFilter: value));
+    } else {
+      emit(FilterState(categories: state.categories, itemFilter: value));
+    }
   }
 }

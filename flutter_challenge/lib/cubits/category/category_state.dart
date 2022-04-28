@@ -3,28 +3,30 @@ part of 'category_cubit.dart';
 @immutable
 abstract class CategoryState {
   final ItemCategory category;
-  final List<ItemCubit> itemCubits;
+  final List<Item> items;
+  final String filter;
 
-  const CategoryState(this.category, this.itemCubits);
+  List<Item> get favoriteItems =>
+      items.where((element) => element.isFavorite()).toList();
+
+  List<Item> get itemsWithFilter =>
+      items.where((element) => element.name.contains(filter)).toList();
+
+  const CategoryState(this.category, this.items, this.filter);
 }
 
 class LoadingCategory extends CategoryState {
-  LoadingCategory() : super(ItemCategory.empty(), []);
-}
-
-class CategoryHide extends CategoryState {
-  final bool showItems;
-  const CategoryHide(
-      ItemCategory category, List<ItemCubit> itemCubits, this.showItems)
-      : super(category, itemCubits);
+  LoadingCategory(ItemCategory category) : super(category, [], '');
 }
 
 class CategoryHideItems extends CategoryState {
-  const CategoryHideItems(ItemCategory category, List<ItemCubit> itemCubits)
-      : super(category, itemCubits);
+  const CategoryHideItems(ItemCategory category, List<Item> items,
+      {filter = ''})
+      : super(category, items, filter);
 }
 
 class CategoryShowItems extends CategoryState {
-  const CategoryShowItems(ItemCategory category, List<ItemCubit> itemCubits)
-      : super(category, itemCubits);
+  const CategoryShowItems(ItemCategory category, List<Item> items,
+      {filter = ''})
+      : super(category, items, filter);
 }
