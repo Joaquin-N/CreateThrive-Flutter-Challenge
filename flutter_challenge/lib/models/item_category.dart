@@ -29,6 +29,13 @@ class ItemCategory {
         itemsId.length == other.itemsId.length;
   }
 
+  bool isEqualToAny(List<ItemCategory> categories) {
+    for (var category in categories) {
+      if (hasSameProperties(category)) return true;
+    }
+    return false;
+  }
+
   // set items(List<Item> values) {
   //   _items.clear();
   //   for (String doc in docs) {

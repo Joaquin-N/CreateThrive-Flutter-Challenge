@@ -18,9 +18,9 @@ class CategoryCubit extends Cubit<CategoryState> {
   StreamSubscription? itemsSubscription;
 
   CategoryCubit({required category, required this.repository})
-      : super(LoadingCategory(category)) {
-    _loadCategory();
-    _loadItems();
+      : super(LoadingCategory()) {
+    _loadCategory(category);
+    //_loadItems();
 
     // filterStateStream.listen((filterState) async {
     //   if (state.category.itemsId.isEmpty) return;
@@ -57,34 +57,38 @@ class CategoryCubit extends Cubit<CategoryState> {
 
   void toggleShow() {
     if (state is CategoryShowItems) {
-      _hideItems();
+      emit(CategoryHideItems(state));
     } else {
-      _showItems();
+      (CategoryShowItems(state));
     }
   }
 
   void applyFilter(String filter) {
     if (filter != state.filter) {
       emit(state is CategoryShowItems
-          ? CategoryShowItems(state.category, state.items, filter: filter)
-          : CategoryHideItems(state.category, state.items, filter: filter));
+          ? CategoryShowItems(state, filter: filter)
+          : CategoryHideItems(state, filter: filter));
     }
   }
 
-  void _updateState() {
-    if (state is CategoryShowItems) {
-      _showItems();
+  void _updateState(
+      {ItemCategory? category,
+      List<Item>? items,
+      String? filter,
+      Item? lastDeleted}) {
+    if (state is CategoryHideItems) {
+      emit(CategoryHideItems(state,
+          category: category,
+          items: items,
+          filter: filter,
+          lastDeleted: lastDeleted));
     } else {
-      _hideItems();
+      emit(CategoryShowItems(state,
+          category: category,
+          items: items,
+          filter: filter,
+          lastDeleted: lastDeleted));
     }
-  }
-
-  void _showItems() {
-    emit(CategoryShowItems(state.category, state.items, filter: state.filter));
-  }
-
-  void _hideItems() {
-    emit(CategoryHideItems(state.category, state.items, filter: state.filter));
   }
 
   void toggleFav(Item item) {
@@ -97,8 +101,8 @@ class CategoryCubit extends Cubit<CategoryState> {
   }
 
   void delete(Item item) {
-    emit(ItemDeleted(state.item));
-    repository.deleteItem(state.item);
+    _updateState(lastDeleted: item);
+    repository.deleteItem(item);
   }
 
   void reorder(oldIndex, newIndex) {
@@ -107,7 +111,7 @@ class CategoryCubit extends Cubit<CategoryState> {
     repository.saveCategory(category);
     // state update is handled locally to avoid delay
     _reorderCubits(oldIndex, newIndex);
-    emit(CategoryShowItems(category, state.items));
+    emit(CategoryShowItems(state, category: category));
   }
 
   void _reorderCubits(oldIndex, newIndex) {
@@ -118,12 +122,12 @@ class CategoryCubit extends Cubit<CategoryState> {
     state.items.insert(newIndex, item);
   }
 
-  void _loadCategory() {
+  void _loadCategory(ItemCategory category) {
     categorySubscription =
-        repository.getCategoryUpdates(state.category).listen((update) {
+        repository.getCategoryUpdates(category).listen((update) {
       // This statement prevents rebuilding the ui when items rearanged
       if (state.category.hasSameProperties(update)) return;
-      emit(LoadingCategory(update));
+      _updateState(category: update);
       _loadItems();
     });
   }
@@ -131,9 +135,10 @@ class CategoryCubit extends Cubit<CategoryState> {
   void _loadItems() {
     if (itemsSubscription != null) itemsSubscription!.cancel();
 
+    if (state.category.itemsId.isEmpty) return;
     itemsSubscription =
         repository.getCategoryItems(state.category).listen((items) {
-      _updateState();
+      _updateState(items: items);
     });
   }
 

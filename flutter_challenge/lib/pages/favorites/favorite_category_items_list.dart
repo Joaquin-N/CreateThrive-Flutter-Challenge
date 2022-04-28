@@ -6,13 +6,14 @@ import 'package:flutter_challenge/cubits/item/item_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
 import 'package:flutter_challenge/pages/widgets/custom_snack_bar.dart';
+import 'package:flutter_challenge/repositories/data_repository.dart';
 import 'package:intl/intl.dart';
 
 class FavoriteCategoryItemsList extends StatefulWidget {
   FavoriteCategoryItemsList({
     Key? key,
     required ItemCategory category,
-  })  : cubit = CategoryCubit(category: category),
+  })  : cubit = CategoryCubit(category: category, repository: DataRepository()),
         super(key: key);
   final CategoryCubit cubit;
 
@@ -75,7 +76,7 @@ class ItemListTile extends StatefulWidget {
   ItemListTile({
     Key? key,
     required Item item,
-  })  : cubit = ItemCubit(item: item),
+  })  : cubit = ItemCubit(item: item, repository: DataRepository()),
         super(key: key);
 
   final ItemCubit cubit;

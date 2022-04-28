@@ -5,6 +5,7 @@ import 'package:flutter_challenge/cubits/data/data_cubit.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
 import 'package:flutter_challenge/pages/shopping_list/category_items_list.dart';
 import 'package:flutter_challenge/pages/favorites/favorite_category_items_list.dart';
+import 'package:flutter_challenge/repositories/data_repository.dart';
 
 class ItemsList extends StatelessWidget {
   const ItemsList({
@@ -30,7 +31,11 @@ class ItemsList extends StatelessWidget {
                 return favorites
                     ? FavoriteCategoryItemsList(
                         category: state.categories[index])
-                    : CategoryItemsList(category: state.categories[index]);
+                    : CategoryItemsList(
+                        cubit: CategoryCubit(
+                            category: state.categories[index],
+                            repository: RepositoryProvider.of<DataRepository>(
+                                context)));
               }),
             ),
           );

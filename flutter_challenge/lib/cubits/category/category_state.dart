@@ -5,6 +5,7 @@ abstract class CategoryState {
   final ItemCategory category;
   final List<Item> items;
   final String filter;
+  final Item? lastDeleted;
 
   List<Item> get favoriteItems =>
       items.where((element) => element.isFavorite()).toList();
@@ -12,21 +13,29 @@ abstract class CategoryState {
   List<Item> get itemsWithFilter =>
       items.where((element) => element.name.contains(filter)).toList();
 
-  const CategoryState(this.category, this.items, this.filter);
+  const CategoryState(this.category, this.items, this.filter, this.lastDeleted);
 }
 
 class LoadingCategory extends CategoryState {
-  LoadingCategory(ItemCategory category) : super(category, [], '');
+  LoadingCategory() : super(ItemCategory.empty(), [], '', null);
 }
 
 class CategoryHideItems extends CategoryState {
-  const CategoryHideItems(ItemCategory category, List<Item> items,
-      {filter = ''})
-      : super(category, items, filter);
+  CategoryHideItems(CategoryState state,
+      {ItemCategory? category,
+      List<Item>? items,
+      String? filter,
+      Item? lastDeleted})
+      : super(category ?? state.category, items ?? state.items,
+            filter ?? state.filter, lastDeleted ?? state.lastDeleted);
 }
 
 class CategoryShowItems extends CategoryState {
-  const CategoryShowItems(ItemCategory category, List<Item> items,
-      {filter = ''})
-      : super(category, items, filter);
+  CategoryShowItems(CategoryState state,
+      {ItemCategory? category,
+      List<Item>? items,
+      String? filter,
+      Item? lastDeleted})
+      : super(category ?? state.category, items ?? state.items,
+            filter ?? state.filter, lastDeleted ?? state.lastDeleted);
 }
