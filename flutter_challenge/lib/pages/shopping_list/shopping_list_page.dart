@@ -100,8 +100,9 @@ class FilteringBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 10.0, right: 2.0),
+    return Container(
+      color: Colors.grey.withAlpha(80),
+      padding: const EdgeInsets.only(left: 10.0, right: 5.0, top: 8, bottom: 5),
       child: Row(
         children: [
           FilterButton(
@@ -115,6 +116,12 @@ class FilteringBar extends StatelessWidget {
               controller: controller,
               onChanged: onTextChange,
               decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.9),
+                isDense: true,
                 hintText: 'Search',
                 suffixIcon: IconButton(
                   onPressed: () {

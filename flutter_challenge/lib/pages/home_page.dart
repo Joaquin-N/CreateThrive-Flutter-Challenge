@@ -47,7 +47,10 @@ class Home extends StatelessWidget {
     return BlocBuilder<ApplicationCubit, ApplicationState>(
       builder: (context, state) {
         return Scaffold(
-          appBar: AppBar(title: Text(state.title)),
+          appBar: AppBar(
+            title: Text(state.title),
+            backgroundColor: Colors.deepPurpleAccent,
+          ),
           drawer: Builder(builder: (context) {
             return Drawer(
               child: Column(children: [

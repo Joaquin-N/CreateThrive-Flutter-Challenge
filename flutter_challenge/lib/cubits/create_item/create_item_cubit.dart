@@ -56,7 +56,7 @@ class CreateItemCubit extends Cubit<CreateItemState> {
   void save() async {
     Item item = state.item;
     try {
-      repository.saveItem(item);
+      repository.createItem(item);
       emit(state.toSaved());
       emit(CreateItemInitial(
           item: Item.empty(), categoriesNames: state.categoriesNames));

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_challenge/constants.dart';
@@ -34,7 +35,7 @@ class CategoryItemsList extends StatelessWidget {
                 listener: (context, state) {
                   ScaffoldMessenger.of(context).showSnackBar(CustomSnackBar(
                       text:
-                          'Item ${state.lastFavoriteAdded} added to favorites'));
+                          'Item ${state.lastFavoriteAdded!.name} added to favorites'));
                 }),
             BlocListener<CategoryCubit, CategoryState>(
                 bloc: cubit,
@@ -44,7 +45,7 @@ class CategoryItemsList extends StatelessWidget {
                 listener: (context, state) {
                   ScaffoldMessenger.of(context).showSnackBar(CustomSnackBar(
                       text:
-                          'Item ${state.lastFavoriteRemoved} removed from favorites'));
+                          'Item ${state.lastFavoriteRemoved!.name} removed from favorites'));
                 })
           ],
           child: BlocBuilder<CategoryCubit, CategoryState>(
@@ -58,14 +59,19 @@ class CategoryItemsList extends StatelessWidget {
               return Visibility(
                 visible: filteredItems.isNotEmpty,
                 child: Container(
-                  color: Color(state.category.color).withOpacity(0.6),
+                  color: Color(state.category.color).withOpacity(0.4),
                   width: double.infinity,
                   child: Column(
                     children: [
                       GestureDetector(
                         onTap: cubit.toggleShow,
                         child: Container(
-                          decoration: categoryBoxDecoration,
+                          decoration: BoxDecoration(
+                            color: Color(state.category.color).withOpacity(0.6),
+                            border: Border.symmetric(
+                                horizontal: BorderSide(
+                                    width: 1, color: Colors.black45)),
+                          ),
                           padding: EdgeInsets.symmetric(horizontal: 18),
                           height: 50,
                           child: Row(
@@ -159,6 +165,11 @@ class ItemListTile extends StatelessWidget {
             borderSide: BorderSide(color: Colors.grey, width: 1)),
         onLongPress: () => print('edit'),
         title: Text(item.name),
+        leading: CircleAvatar(
+            backgroundColor: Colors.grey,
+            backgroundImage: item.imgUrl == ''
+                ? null
+                : CachedNetworkImageProvider(item.imgUrl)),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -11,12 +11,13 @@ class CreateItemPage extends StatelessWidget {
   final TextEditingController tec;
   const CreateItemPage({Key? key, required this.tec}) : super(key: key);
 
+
+  // TODO disable textFieldFocus
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CreateItemCubit, CreateItemState>(
       builder: (context, state) {
         final cubit = context.read<CreateItemCubit>();
-
         return Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
