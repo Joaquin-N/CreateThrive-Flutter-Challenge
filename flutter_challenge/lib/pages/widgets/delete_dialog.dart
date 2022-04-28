@@ -8,7 +8,7 @@ class DeleteDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('Delete item'),
-      content: Text('Are you sure of deleting the item ${itemName}?'),
+      content: Text('Are you sure of deleting ${itemName}?'),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),

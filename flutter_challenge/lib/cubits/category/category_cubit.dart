@@ -59,7 +59,7 @@ class CategoryCubit extends Cubit<CategoryState> {
     if (state is CategoryShowItems) {
       emit(CategoryHideItems(state));
     } else {
-      (CategoryShowItems(state));
+      emit(CategoryShowItems(state));
     }
   }
 
@@ -75,33 +75,38 @@ class CategoryCubit extends Cubit<CategoryState> {
       {ItemCategory? category,
       List<Item>? items,
       String? filter,
-      Item? lastDeleted}) {
+      Item? lastFavoriteRemoved,
+      Item? lastFavoriteAdded}) {
     if (state is CategoryHideItems) {
       emit(CategoryHideItems(state,
           category: category,
           items: items,
           filter: filter,
-          lastDeleted: lastDeleted));
+          lastFavoriteRemoved: lastFavoriteRemoved,
+          lastFavoriteAdded: lastFavoriteAdded));
     } else {
       emit(CategoryShowItems(state,
           category: category,
           items: items,
           filter: filter,
-          lastDeleted: lastDeleted));
+          lastFavoriteRemoved: lastFavoriteRemoved,
+          lastFavoriteAdded: lastFavoriteAdded));
     }
   }
 
   void toggleFav(Item item) {
     if (item.favAddDate == null) {
       item.favAddDate = DateTime.now();
+      _updateState(lastFavoriteAdded: item);
     } else {
       item.favAddDate = null;
+      _updateState(lastFavoriteRemoved: item);
     }
+
     repository.saveItem(item);
   }
 
   void delete(Item item) {
-    _updateState(lastDeleted: item);
     repository.deleteItem(item);
   }
 
@@ -110,11 +115,11 @@ class CategoryCubit extends Cubit<CategoryState> {
     category.reorder(oldIndex, newIndex);
     repository.saveCategory(category);
     // state update is handled locally to avoid delay
-    _reorderCubits(oldIndex, newIndex);
+    _reorderItems(oldIndex, newIndex);
     emit(CategoryShowItems(state, category: category));
   }
 
-  void _reorderCubits(oldIndex, newIndex) {
+  void _reorderItems(oldIndex, newIndex) {
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }
@@ -138,6 +143,7 @@ class CategoryCubit extends Cubit<CategoryState> {
     if (state.category.itemsId.isEmpty) return;
     itemsSubscription =
         repository.getCategoryItems(state.category).listen((items) {
+      items = state.category.sortItems(items);
       _updateState(items: items);
     });
   }

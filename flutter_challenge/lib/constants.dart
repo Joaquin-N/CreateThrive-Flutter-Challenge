@@ -14,3 +14,8 @@ Color categoryColorDisabled = Colors.blue.shade200;
 
 TextStyle defaultTextStyle =
     const TextStyle(fontSize: 16, fontWeight: FontWeight.w500);
+
+BoxDecoration categoryBoxDecoration = const BoxDecoration(
+  border:
+      Border.symmetric(horizontal: BorderSide(width: 1, color: Colors.black45)),
+);

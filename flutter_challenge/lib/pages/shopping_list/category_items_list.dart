@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_challenge/constants.dart';
 import 'package:flutter_challenge/cubits/category/category_cubit.dart';
 import 'package:flutter_challenge/cubits/data/data_cubit.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
@@ -19,74 +20,96 @@ class CategoryItemsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<FilterCubit, FilterState>(
+      buildWhen: (previous, current) =>
+          previous.itemFilter != current.itemFilter,
       builder: (context, filterState) {
-        context.read<DataCubit>().applyFilter(filterState.categoryFilter);
         cubit.applyFilter(filterState.itemFilter);
 
-        return BlocBuilder<CategoryCubit, CategoryState>(
-          bloc: cubit,
-          builder: (context, state) {
-            if (state is LoadingCategory) {
-              return Container();
-            }
+        return MultiBlocListener(
+          listeners: [
+            BlocListener<CategoryCubit, CategoryState>(
+                bloc: cubit,
+                listenWhen: (oldState, newState) =>
+                    oldState.lastFavoriteAdded != newState.lastFavoriteAdded,
+                listener: (context, state) {
+                  ScaffoldMessenger.of(context).showSnackBar(CustomSnackBar(
+                      text:
+                          'Item ${state.lastFavoriteAdded} added to favorites'));
+                }),
+            BlocListener<CategoryCubit, CategoryState>(
+                bloc: cubit,
+                listenWhen: (oldState, newState) =>
+                    oldState.lastFavoriteRemoved !=
+                    newState.lastFavoriteRemoved,
+                listener: (context, state) {
+                  ScaffoldMessenger.of(context).showSnackBar(CustomSnackBar(
+                      text:
+                          'Item ${state.lastFavoriteRemoved} removed from favorites'));
+                })
+          ],
+          child: BlocBuilder<CategoryCubit, CategoryState>(
+            bloc: cubit,
+            builder: (context, state) {
+              if (state is LoadingCategory) {
+                return Container();
+              }
 
-            List<Item> filteredItems = state.itemsWithFilter;
-            var dataCubit = context.read<DataCubit>();
-            return Visibility(
-              visible: filteredItems.isNotEmpty &&
-                  state.category
-                      .isEqualToAny(dataCubit.state.categoriesWithFilter),
-              child: Container(
-                color: Color(state.category.color).withOpacity(0.6),
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: cubit.toggleShow,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 18),
-                        height: 50,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(width: 32.0),
-                            Text(
-                              state.category.name,
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            Icon(state is CategoryShowItems
-                                ? Icons.arrow_drop_down
-                                : Icons.arrow_left),
-                          ],
+              List<Item> filteredItems = state.itemsWithFilter;
+              return Visibility(
+                visible: filteredItems.isNotEmpty,
+                child: Container(
+                  color: Color(state.category.color).withOpacity(0.6),
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: cubit.toggleShow,
+                        child: Container(
+                          decoration: categoryBoxDecoration,
+                          padding: EdgeInsets.symmetric(horizontal: 18),
+                          height: 50,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(width: 32.0),
+                              Text(
+                                state.category.name,
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              Icon(state is CategoryShowItems
+                                  ? Icons.arrow_drop_down
+                                  : Icons.arrow_left),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    if (state is CategoryShowItems)
-                      ReorderableListView(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        onReorder: (oldIndex, newIndex) =>
-                            cubit.reorder(oldIndex, newIndex),
-                        children: List.generate(
-                          filteredItems.length,
-                          (index) {
-                            return ItemListTile(
-                              index: index,
-                              item: filteredItems[index],
-                              onToggleFav: () =>
-                                  cubit.toggleFav(filteredItems[index]),
-                              onDelete: () =>
-                                  cubit.delete(filteredItems[index]),
-                              key: Key('$index'),
-                            );
-                          },
+                      if (state is CategoryShowItems)
+                        ReorderableListView(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          onReorder: (oldIndex, newIndex) =>
+                              cubit.reorder(oldIndex, newIndex),
+                          children: List.generate(
+                            filteredItems.length,
+                            (index) {
+                              return ItemListTile(
+                                index: index,
+                                item: filteredItems[index],
+                                onToggleFav: () =>
+                                    cubit.toggleFav(filteredItems[index]),
+                                onDelete: () =>
+                                    cubit.delete(filteredItems[index]),
+                                key: Key('$index'),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );
@@ -109,6 +132,8 @@ class ItemListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool reorderEnabled = context.read<FilterCubit>().state.itemFilter == '' &&
+        context.read<FilterCubit>().state.categoryFilter == '';
     return Dismissible(
       key: Key('x$key'),
       background: Container(color: Colors.yellow[200]),
@@ -125,12 +150,13 @@ class ItemListTile extends StatelessWidget {
                   ));
           if (answer != null && answer) {
             onDelete();
-            return Future.value(true);
           }
         }
         return Future.value(false);
       },
       child: ListTile(
+        shape: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey, width: 1)),
         onLongPress: () => print('edit'),
         title: Text(item.name),
         trailing: Row(
@@ -140,9 +166,17 @@ class ItemListTile extends StatelessWidget {
               onPressed: () => onToggleFav(),
               icon: Icon(item.isFavorite() ? Icons.star : Icons.star_border),
             ),
-            ReorderableDragStartListener(
-              index: index,
-              child: const Icon(Icons.drag_handle),
+            Visibility(
+              child: ReorderableDragStartListener(
+                enabled: reorderEnabled,
+                index: index,
+                child: Icon(
+                  Icons.drag_handle,
+                  color: reorderEnabled
+                      ? Theme.of(context).iconTheme.color
+                      : Colors.grey.withOpacity(0.7),
+                ),
+              ),
             ),
           ],
         ),

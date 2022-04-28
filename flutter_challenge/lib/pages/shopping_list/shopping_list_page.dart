@@ -40,7 +40,41 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
             );
           },
         ),
-        Expanded(child: ItemsList()),
+        Expanded(
+          child: BlocBuilder<FilterCubit, FilterState>(
+              buildWhen: (previous, current) =>
+                  previous.categoryFilter != current.categoryFilter,
+              builder: (context, filterState) {
+                context
+                    .read<DataCubit>()
+                    .applyFilter(filterState.categoryFilter);
+                return BlocBuilder<DataCubit, DataState>(
+                  buildWhen: (previous, current) =>
+                      previous.runtimeType != current.runtimeType ||
+                      previous.categoriesWithFilter.length !=
+                          current.categoriesWithFilter.length,
+                  builder: (context, state) {
+                    if (state is DataReady) {
+                      return ScrollConfiguration(
+                        behavior:
+                            const ScrollBehavior().copyWith(overscroll: false),
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: List.generate(
+                              state.categoriesWithFilter.length, (index) {
+                            //TODO put favorites
+                            return CategoryItemsList(
+                                cubit: state.categoriesWithFilter[index]);
+                          }),
+                        ),
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
+              }),
+        ),
       ],
     );
   }

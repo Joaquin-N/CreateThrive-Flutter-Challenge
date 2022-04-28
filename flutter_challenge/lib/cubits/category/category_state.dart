@@ -5,19 +5,22 @@ abstract class CategoryState {
   final ItemCategory category;
   final List<Item> items;
   final String filter;
-  final Item? lastDeleted;
+  final Item? lastFavoriteRemoved;
+  final Item? lastFavoriteAdded;
 
   List<Item> get favoriteItems =>
-      items.where((element) => element.isFavorite()).toList();
+      items.where((element) => element.isFavorite()).toList()
+        ..sort(((a, b) => a.favAddDate!.isAfter(b.favAddDate!) ? -1 : 1));
 
   List<Item> get itemsWithFilter =>
       items.where((element) => element.name.contains(filter)).toList();
 
-  const CategoryState(this.category, this.items, this.filter, this.lastDeleted);
+  const CategoryState(this.category, this.items, this.filter,
+      this.lastFavoriteRemoved, this.lastFavoriteAdded);
 }
 
 class LoadingCategory extends CategoryState {
-  LoadingCategory() : super(ItemCategory.empty(), [], '', null);
+  LoadingCategory() : super(ItemCategory.empty(), [], '', null, null);
 }
 
 class CategoryHideItems extends CategoryState {
@@ -25,9 +28,14 @@ class CategoryHideItems extends CategoryState {
       {ItemCategory? category,
       List<Item>? items,
       String? filter,
-      Item? lastDeleted})
-      : super(category ?? state.category, items ?? state.items,
-            filter ?? state.filter, lastDeleted ?? state.lastDeleted);
+      Item? lastFavoriteRemoved,
+      Item? lastFavoriteAdded})
+      : super(
+            category ?? state.category,
+            items ?? state.items,
+            filter ?? state.filter,
+            lastFavoriteRemoved ?? state.lastFavoriteRemoved,
+            lastFavoriteAdded ?? state.lastFavoriteAdded);
 }
 
 class CategoryShowItems extends CategoryState {
@@ -35,7 +43,12 @@ class CategoryShowItems extends CategoryState {
       {ItemCategory? category,
       List<Item>? items,
       String? filter,
-      Item? lastDeleted})
-      : super(category ?? state.category, items ?? state.items,
-            filter ?? state.filter, lastDeleted ?? state.lastDeleted);
+      Item? lastFavoriteRemoved,
+      Item? lastFavoriteAdded})
+      : super(
+            category ?? state.category,
+            items ?? state.items,
+            filter ?? state.filter,
+            lastFavoriteRemoved ?? state.lastFavoriteRemoved,
+            lastFavoriteAdded ?? state.lastFavoriteAdded);
 }

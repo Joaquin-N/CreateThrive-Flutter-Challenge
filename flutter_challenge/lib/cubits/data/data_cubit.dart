@@ -24,15 +24,18 @@ class DataCubit extends Cubit<DataState> {
 // TODO cancel subscriptions
   void _loadCategories() {
     repository.getCategories().listen((event) {
-      if (state.categories.length != event.length) {
-        emit(DataReady(event));
+      if (state.categoryCubits.length != event.length) {
+        emit(DataReady(List.generate(
+            event.length,
+            (index) => CategoryCubit(
+                category: event[index], repository: repository))));
       }
     });
   }
 
   void applyFilter(String filter) {
     if (filter != state.filter) {
-      emit(DataReady(state.categories, filter: filter));
+      emit(DataReady(state.categoryCubits, filter: filter));
     }
   }
 

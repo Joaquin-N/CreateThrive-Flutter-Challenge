@@ -2,13 +2,14 @@ part of 'data_cubit.dart';
 
 @immutable
 abstract class DataState {
-  final List<ItemCategory> categories;
+  final List<CategoryCubit> categoryCubits;
   final String filter;
 
-  List<ItemCategory> get categoriesWithFilter =>
-      categories.where((element) => element.name.contains(filter)).toList();
+  List<CategoryCubit> get categoriesWithFilter => categoryCubits
+      .where((element) => element.state.category.name.contains(filter))
+      .toList();
 
-  const DataState(this.categories, this.filter);
+  const DataState(this.categoryCubits, this.filter);
 }
 
 //TODO
@@ -17,6 +18,6 @@ class DataLoading extends DataState {
 }
 
 class DataReady extends DataState {
-  const DataReady(List<ItemCategory> categories, {filter = ''})
+  const DataReady(List<CategoryCubit> categories, {filter = ''})
       : super(categories, filter);
 }

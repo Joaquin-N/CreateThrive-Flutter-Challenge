@@ -36,6 +36,18 @@ class ItemCategory {
     return false;
   }
 
+  List<Item> sortItems(List<Item> items) {
+    List<Item> sorted = [];
+    for (String itemId in itemsId) {
+      for (Item item in items) {
+        if (item.id == itemId) {
+          sorted.add(item);
+        }
+      }
+    }
+    return sorted;
+  }
+
   // set items(List<Item> values) {
   //   _items.clear();
   //   for (String doc in docs) {
