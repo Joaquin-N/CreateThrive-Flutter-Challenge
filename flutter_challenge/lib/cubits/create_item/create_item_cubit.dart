@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter_challenge/exceptions.dart';
 import 'package:flutter_challenge/models/item.dart';
+import 'package:flutter_challenge/repositories/data_repository.dart';
 import 'package:flutter_challenge/services/firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meta/meta.dart';
@@ -7,12 +9,12 @@ import 'package:meta/meta.dart';
 part 'create_item_state.dart';
 
 class CreateItemCubit extends Cubit<CreateItemState> {
-  Firestore fs = Firestore.instance;
-  CreateItemCubit()
+  final DataRepository repository;
+  CreateItemCubit({required this.repository})
       : super(
           CreateItemInitial(item: Item.empty(), categoriesNames: ['']),
         ) {
-    fs.getCategoriesNames().listen((categories) {
+    repository.getCategoriesNames().listen((categories) {
       emit(CreateItemInitial(
           item: state.item, categoriesNames: ['', ...categories]));
     });
@@ -53,13 +55,13 @@ class CreateItemCubit extends Cubit<CreateItemState> {
 
   void save() async {
     Item item = state.item;
-    if (await fs.checkItemDuplicated(item)) {
+    try {
+      repository.saveItem(item);
+      emit(state.toSaved());
+      emit(CreateItemInitial(
+          item: Item.empty(), categoriesNames: state.categoriesNames));
+    } on DuplicatedElementException {
       emit(state.toErrorDuplicated());
-      return;
     }
-    fs.saveItem(item);
-    emit(state.toSaved());
-    emit(CreateItemInitial(
-        item: Item.empty(), categoriesNames: state.categoriesNames));
   }
 }

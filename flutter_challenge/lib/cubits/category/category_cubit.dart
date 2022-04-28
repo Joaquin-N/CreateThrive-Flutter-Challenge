@@ -6,17 +6,19 @@ import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
 import 'package:flutter_challenge/cubits/item/item_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
+import 'package:flutter_challenge/repositories/data_repository.dart';
 import 'package:flutter_challenge/services/firestore.dart';
 import 'package:meta/meta.dart';
 
 part 'category_state.dart';
 
 class CategoryCubit extends Cubit<CategoryState> {
-  final fs = Firestore.instance;
+  final DataRepository repository;
   StreamSubscription? categorySubscription;
   StreamSubscription? itemsSubscription;
 
-  CategoryCubit({required category}) : super(LoadingCategory(category)) {
+  CategoryCubit({required category, required this.repository})
+      : super(LoadingCategory(category)) {
     _loadCategory();
     _loadItems();
 
@@ -69,18 +71,40 @@ class CategoryCubit extends Cubit<CategoryState> {
     }
   }
 
+  void _updateState() {
+    if (state is CategoryShowItems) {
+      _showItems();
+    } else {
+      _hideItems();
+    }
+  }
+
   void _showItems() {
-    emit(CategoryShowItems(state.category, state.items));
+    emit(CategoryShowItems(state.category, state.items, filter: state.filter));
   }
 
   void _hideItems() {
-    emit(CategoryHideItems(state.category, state.items));
+    emit(CategoryHideItems(state.category, state.items, filter: state.filter));
+  }
+
+  void toggleFav(Item item) {
+    if (item.favAddDate == null) {
+      item.favAddDate = DateTime.now();
+    } else {
+      item.favAddDate = null;
+    }
+    repository.saveItem(item);
+  }
+
+  void delete(Item item) {
+    emit(ItemDeleted(state.item));
+    repository.deleteItem(state.item);
   }
 
   void reorder(oldIndex, newIndex) {
     ItemCategory category = state.category;
     category.reorder(oldIndex, newIndex);
-    fs.updateCategory(category);
+    repository.saveCategory(category);
     // state update is handled locally to avoid delay
     _reorderCubits(oldIndex, newIndex);
     emit(CategoryShowItems(category, state.items));
@@ -96,7 +120,7 @@ class CategoryCubit extends Cubit<CategoryState> {
 
   void _loadCategory() {
     categorySubscription =
-        fs.getCategoryUpdates(state.category).listen((update) {
+        repository.getCategoryUpdates(state.category).listen((update) {
       // This statement prevents rebuilding the ui when items rearanged
       if (state.category.hasSameProperties(update)) return;
       emit(LoadingCategory(update));
@@ -107,12 +131,9 @@ class CategoryCubit extends Cubit<CategoryState> {
   void _loadItems() {
     if (itemsSubscription != null) itemsSubscription!.cancel();
 
-    itemsSubscription = fs.getCategoryItems(state.category).listen((items) {
-      if (state is CategoryHideItems) {
-        emit(CategoryHideItems(state.category, items));
-      } else {
-        emit(CategoryShowItems(state.category, items));
-      }
+    itemsSubscription =
+        repository.getCategoryItems(state.category).listen((items) {
+      _updateState();
     });
   }
 

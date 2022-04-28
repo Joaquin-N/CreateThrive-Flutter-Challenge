@@ -3,15 +3,16 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
+import 'package:flutter_challenge/repositories/data_repository.dart';
 import 'package:flutter_challenge/services/firestore.dart';
 import 'package:meta/meta.dart';
 
 part 'item_state.dart';
 
 class ItemCubit extends Cubit<ItemState> {
-  final fs = Firestore.instance;
+  final DataRepository repository;
 
-  ItemCubit({required item}) : super(ItemLoading()) {
+  ItemCubit({required item, required this.repository}) : super(ItemLoading()) {
     _emitState(item);
     // filterStateStream.listen((filterState) {
     //   if (filterState.favorites) {
@@ -47,12 +48,12 @@ class ItemCubit extends Cubit<ItemState> {
     } else {
       item.favAddDate = null;
     }
-    fs.updateItem(item);
+    repository.saveItem(item);
     _emitState(item);
   }
 
   void delete() {
     emit(ItemDeleted(state.item));
-    fs.deleteItem(state.item);
+    repository.deleteItem(state.item);
   }
 }

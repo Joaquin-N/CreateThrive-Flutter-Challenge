@@ -1,17 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_challenge/exceptions.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
 import 'package:async/async.dart';
 
 class Firestore {
-  static Firestore? _instance;
-
-  static Firestore get instance {
-    _instance ??= Firestore();
-    return _instance!;
-  }
-
   final _items = FirebaseFirestore.instance.collection('items');
   final _categories = FirebaseFirestore.instance.collection('categories');
 
@@ -57,10 +51,7 @@ class Firestore {
   }
 
   Stream<ItemCategory> getCategoryUpdates(ItemCategory category) {
-    return _categories
-        .doc(category.id)
-        .snapshots()
-        .map(((snap) => ItemCategory.fromSnapshot(snap)));
+    return getCategory(category.id);
   }
 
   // TODO check error on delete item
@@ -71,17 +62,13 @@ class Firestore {
         .map(((snap) => Item.fromSnapshot(snap)));
   }
 
-  void updateItem(Item item) {
-    _items.doc(item.id).update(item.toDocument());
-  }
-
-  void deleteItem(Item item) async {
+  Future deleteItem(Item item) async {
     String categoryId = await _categories
         .where('items_doc', arrayContains: item.id)
         .get()
         .then((snap) => snap.docs.first.id);
     await _removeItemFromCategory(item.id, categoryId);
-    _items.doc(item.id).delete();
+    await _items.doc(item.id).delete();
   }
 
   Future _addItemToCategory(String itemId, String categoryId) async {
@@ -109,20 +96,25 @@ class Firestore {
   //       .snapshots();
   // }
 
-  Future<bool> addCategory(ItemCategory cat) async {
-    if (await checkCategoryDuplicated(cat)) return false;
-    var doc = await _categories.add(cat.toDocument());
-    cat.id = doc.id;
+  Future<bool> addCategory(ItemCategory category) async {
+    if (await checkCategoryDuplicated(category)) {
+      throw DuplicatedElementException(
+          'Category with name ${category.name} already exists');
+    }
+    var doc = await _categories.add(category.toDocument());
+    category.id = doc.id;
     return true;
   }
 
-  Future<bool> updateCategory(ItemCategory cat) async {
-    await _categories.doc(cat.id).update(cat.toDocument());
-    return true;
+  Future updateCategory(ItemCategory category) async {
+    await _categories.doc(category.id).update(category.toDocument());
   }
 
   Future<bool> addItem(Item item) async {
-    if (await checkItemDuplicated(item)) return false;
+    if (await checkItemDuplicated(item)) {
+      throw DuplicatedElementException(
+          'Item with name ${item.name} already exists');
+    }
     var doc = await _items.add(item.toDocument());
     item.id = doc.id;
 
@@ -135,19 +127,23 @@ class Firestore {
     return true;
   }
 
-  void saveItem(Item item) {
+  Future updateItem(Item item) async {
+    await _items.doc(item.id).update(item.toDocument());
+  }
+
+  Future saveItem(Item item) async {
     if (item.id == '') {
-      addItem(item);
+      await addItem(item);
     } else {
-      _items.doc(item.id).update(item.toDocument());
+      await _items.doc(item.id).update(item.toDocument());
     }
   }
 
-  void saveCategory(ItemCategory category) {
+  Future saveCategory(ItemCategory category) async {
     if (category.id == '') {
-      addCategory(category);
+      await addCategory(category);
     } else {
-      updateCategory(category);
+      await updateCategory(category);
     }
   }
 

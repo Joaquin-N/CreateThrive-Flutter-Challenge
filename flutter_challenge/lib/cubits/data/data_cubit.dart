@@ -3,16 +3,17 @@ import 'package:flutter_challenge/cubits/category/category_cubit.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
+import 'package:flutter_challenge/repositories/data_repository.dart';
 import 'package:flutter_challenge/services/firestore.dart';
 import 'package:meta/meta.dart';
 
 part 'data_state.dart';
 
 class DataCubit extends Cubit<DataState> {
-  final fs = Firestore.instance;
+  final DataRepository repository;
   //final FilterCubit filterCubit;
 
-  DataCubit() : super(DataLoading()) {
+  DataCubit({required this.repository}) : super(DataLoading()) {
     _loadCategories();
   }
 
@@ -22,7 +23,7 @@ class DataCubit extends Cubit<DataState> {
   // }
 // TODO cancel subscriptions
   void _loadCategories() {
-    fs.getCategories().listen((event) {
+    repository.getCategories().listen((event) {
       if (state.categories.length != event.length) {
         emit(DataReady(event));
       }

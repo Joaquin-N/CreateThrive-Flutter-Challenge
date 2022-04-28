@@ -1,13 +1,15 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter_challenge/exceptions.dart';
 import 'package:flutter_challenge/models/item_category.dart';
+import 'package:flutter_challenge/repositories/data_repository.dart';
 import 'package:flutter_challenge/services/firestore.dart';
 import 'package:meta/meta.dart';
 
 part 'create_category_state.dart';
 
 class CreateCategoryCubit extends Cubit<CreateCategoryState> {
-  Firestore fs = Firestore.instance;
-  CreateCategoryCubit()
+  final DataRepository repository;
+  CreateCategoryCubit({required this.repository})
       : super(CreateCategoryInitial(category: ItemCategory.empty()));
 
   void update({String? name, int? color}) {
@@ -22,12 +24,12 @@ class CreateCategoryCubit extends Cubit<CreateCategoryState> {
 
   void save() async {
     ItemCategory category = state.category;
-    if (await fs.checkCategoryDuplicated(category)) {
+    try {
+      repository.saveCategory(category);
+      emit(state.toSaved());
+      emit(CreateCategoryInitial(category: ItemCategory.empty()));
+    } on DuplicatedElementException {
       emit(state.toErrorDuplicated());
-      return;
     }
-    fs.saveCategory(category);
-    emit(state.toSaved());
-    emit(CreateCategoryInitial(category: ItemCategory.empty()));
   }
 }
