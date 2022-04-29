@@ -24,7 +24,7 @@ class CreateCategoryCubit extends Cubit<CreateCategoryState> {
   void save() async {
     ItemCategory category = state.category;
     try {
-      repository.saveCategory(category);
+      await repository.saveCategory(category);
       emit(CreateCategorySaved(category: category));
       emit(const CreateCategoryInitial(category: ItemCategory.empty()));
     } on DuplicatedElementException {

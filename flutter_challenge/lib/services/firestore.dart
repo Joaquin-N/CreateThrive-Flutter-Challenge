@@ -11,11 +11,15 @@ class Firestore {
   // Categories
 
   Future<ItemCategory> saveCategory(ItemCategory category) async {
-    if (category.id == '') {
-      return await _addCategory(category);
-    } else {
-      await _updateCategory(category);
-      return category;
+    try {
+      if (category.id == '') {
+        return await _addCategory(category);
+      } else {
+        await _updateCategory(category);
+        return category;
+      }
+    } catch (e) {
+      rethrow;
     }
   }
 
@@ -77,11 +81,15 @@ class Firestore {
   // Items
 
   Future<Item> saveItem(Item item) async {
-    if (item.id == '') {
-      return await _addItem(item);
-    } else {
-      await _items.doc(item.id).update(item.toDocument());
-      return item;
+    try {
+      if (item.id == '') {
+        return await _addItem(item);
+      } else {
+        await _items.doc(item.id).update(item.toDocument());
+        return item;
+      }
+    } catch (e) {
+      rethrow;
     }
   }
 

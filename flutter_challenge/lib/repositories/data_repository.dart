@@ -17,16 +17,25 @@ class DataRepository {
 
   Stream<List<String>> getCategoriesNames() => _fs.getCategoriesNames();
 
-  Future saveCategory(ItemCategory category) async =>
+  Future saveCategory(ItemCategory category) async {
+    try {
       await _fs.saveCategory(category);
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   Future saveItem(Item item) async => _fs.saveItem(item);
 
   Future createItem(Item item) async {
-    item = await _fs.saveItem(item);
-    item = item.copyWith(
-        imgUrl: await _cs.uploadImage(item.localImgPath!, item.id));
-    await _fs.saveItem(item);
+    try {
+      item = await _fs.saveItem(item);
+      item = item.copyWith(
+          imgUrl: await _cs.uploadImage(item.localImgPath!, item.id));
+      await _fs.saveItem(item);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future deleteItem(Item item) async {
