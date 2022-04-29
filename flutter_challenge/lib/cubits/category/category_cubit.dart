@@ -48,19 +48,21 @@ class CategoryCubit extends Cubit<CategoryState> {
 
   void reorder(oldIndex, newIndex) {
     ItemCategory category = state.category;
-    category.reorder(oldIndex, newIndex);
+    category = category.reorder(oldIndex, newIndex);
     repository.saveCategory(category);
     // state update is handled locally to avoid delay
-    _reorderItems(oldIndex, newIndex);
-    emit(state.copyWith(category: category));
+    List<Item> items = _reorderItems(oldIndex, newIndex);
+    emit(state.copyWith(category: category, items: items));
   }
 
-  void _reorderItems(oldIndex, newIndex) {
+  List<Item> _reorderItems(oldIndex, newIndex) {
+    List<Item> items = List.from(state.items);
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }
-    Item item = state.items.removeAt(oldIndex);
-    state.items.insert(newIndex, item);
+    Item item = items.removeAt(oldIndex);
+    items.insert(newIndex, item);
+    return items;
   }
 
   void _loadCategory(ItemCategory category) {

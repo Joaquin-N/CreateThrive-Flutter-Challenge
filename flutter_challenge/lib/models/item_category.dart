@@ -54,12 +54,15 @@ class ItemCategory extends Equatable {
     return sorted;
   }
 
-  void reorder(int oldIndex, int newIndex) {
+  ItemCategory reorder(int oldIndex, int newIndex) {
+    List<String> items = List.from(itemsId);
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }
-    String item = itemsId.removeAt(oldIndex);
-    itemsId.insert(newIndex, item);
+    String item = items.removeAt(oldIndex);
+    items.insert(newIndex, item);
+
+    return copyWith(itemsId: items);
   }
 
   Map<String, dynamic> toDocument() {
