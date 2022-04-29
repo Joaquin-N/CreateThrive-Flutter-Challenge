@@ -21,10 +21,10 @@ class DrawerButton extends StatelessWidget {
           children: <Widget>[
             Icon(icon),
             Padding(
-              padding: EdgeInsets.only(left: 10.0),
+              padding: const EdgeInsets.only(left: 10.0),
               child: Text(
                 text,
-                style: TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16),
               ),
             )
           ],

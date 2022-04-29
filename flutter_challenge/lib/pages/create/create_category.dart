@@ -52,7 +52,7 @@ class CreateCategoryPage extends StatelessWidget {
             ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: categoryColor),
                 onPressed: state is CreateCategoryReady ? cubit.save : null,
-                child: Text('Create Category'))
+                child: const Text('Create Category'))
           ],
         );
       },

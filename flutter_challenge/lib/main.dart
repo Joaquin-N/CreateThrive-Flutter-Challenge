@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_challenge/firebase_options.dart';
 import 'package:flutter_challenge/pages/home_page.dart';
 import 'package:flutter_challenge/routes.dart';
-import 'package:flutter_challenge/services/firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

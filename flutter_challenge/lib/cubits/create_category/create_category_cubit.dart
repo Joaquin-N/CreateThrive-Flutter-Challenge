@@ -10,7 +10,7 @@ part 'create_category_state.dart';
 class CreateCategoryCubit extends Cubit<CreateCategoryState> {
   final DataRepository repository;
   CreateCategoryCubit({required this.repository})
-      : super(CreateCategoryInitial(category: ItemCategory.empty()));
+      : super(const CreateCategoryInitial(category: ItemCategory.empty()));
 
   void update({String? name, int? color}) {
     ItemCategory category = state.category.copyWith(name: name, color: color);
@@ -26,7 +26,7 @@ class CreateCategoryCubit extends Cubit<CreateCategoryState> {
     try {
       repository.saveCategory(category);
       emit(CreateCategorySaved(category: category));
-      emit(CreateCategoryInitial(category: ItemCategory.empty()));
+      emit(const CreateCategoryInitial(category: ItemCategory.empty()));
     } on DuplicatedElementException {
       emit(CreateCategoryErrorDuplicated(category: category));
     }

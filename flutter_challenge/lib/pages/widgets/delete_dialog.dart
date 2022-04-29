@@ -7,16 +7,16 @@ class DeleteDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Delete item'),
-      content: Text('Are you sure of deleting ${itemName}?'),
+      title: const Text('Delete item'),
+      content: Text('Are you sure of deleting $itemName?'),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(true),
-          child: Text('Delete'),
+          child: const Text('Delete'),
           style: TextButton.styleFrom(primary: Colors.red),
         )
       ],

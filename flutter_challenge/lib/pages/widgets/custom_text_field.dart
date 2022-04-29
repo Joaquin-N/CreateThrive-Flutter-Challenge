@@ -18,7 +18,7 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         onChanged: onChanged,
         textAlign: TextAlign.center,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           isDense: true,
         ),
       ),

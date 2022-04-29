@@ -26,7 +26,7 @@ void main() {
 
       final cubit = DataCubit(repository: repository);
 
-      expectLater(cubit, emits(DataState()));
+      expectLater(cubit, emits(const DataState()));
     });
   }));
 }

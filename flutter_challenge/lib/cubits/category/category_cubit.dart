@@ -16,7 +16,7 @@ class CategoryCubit extends Cubit<CategoryState> {
   StreamSubscription? itemsSubscription;
 
   CategoryCubit({required category, required this.repository})
-      : super(CategoryState(ItemCategory.empty())) {
+      : super(const CategoryState(ItemCategory.empty())) {
     _loadCategory(category);
   }
 

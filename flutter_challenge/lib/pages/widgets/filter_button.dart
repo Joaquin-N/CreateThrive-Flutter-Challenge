@@ -20,9 +20,9 @@ class FilterButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onPressed,
-      child: Text(text, style: TextStyle(fontSize: 12)),
+      child: Text(text, style: const TextStyle(fontSize: 12)),
       style: ElevatedButton.styleFrom(
-        shape: StadiumBorder(),
+        shape: const StadiumBorder(),
       ).copyWith(
         backgroundColor: MaterialStateProperty.all<Color>(color),
         foregroundColor: MaterialStateProperty.all<Color>(Colors.white),

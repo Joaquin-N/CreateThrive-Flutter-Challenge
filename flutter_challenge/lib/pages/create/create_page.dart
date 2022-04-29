@@ -58,7 +58,7 @@ class _CreatePageState extends State<CreatePage> {
                   SliverFillRemaining(
                     hasScrollBody: false,
                     child: Padding(
-                      padding: EdgeInsets.only(bottom: 10.0, top: 20.0),
+                      padding: const EdgeInsets.only(bottom: 10.0, top: 20.0),
                       child: switchValue
                           ? CreateCategoryPage(tec: itemTec)
                           : CreateItemPage(tec: categoryTec),

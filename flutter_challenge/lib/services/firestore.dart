@@ -3,20 +3,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter_challenge/exceptions.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
-import 'package:async/async.dart';
 
 class Firestore {
   final _items = FirebaseFirestore.instance.collection('items');
   final _categories = FirebaseFirestore.instance.collection('categories');
 
-  // Stream<Item> getCategoryItems(ItemCategory category) {
-  //   List<Stream<Item>> streamList = [];
-  //   for (String doc in category.docs) {
-  //     streamList.add(
-  //         _items.doc(doc).snapshots().map((event) => Item.fromSnapshot(event)));
-  //   }
-  //   return StreamGroup.merge(streamList);
-  // }
+  // Categories
+
+  Future<ItemCategory> saveCategory(ItemCategory category) async {
+    if (category.id == '') {
+      return await _addCategory(category);
+    } else {
+      await _updateCategory(category);
+      return category;
+    }
+  }
+
+  Future<ItemCategory> _addCategory(ItemCategory category) async {
+    if (await _checkCategoryDuplicated(category)) {
+      throw DuplicatedElementException(
+          'Category with name ${category.name} already exists');
+    }
+    var doc = await _categories.add(category.toDocument());
+    category = category.copyWith(id: doc.id);
+    return category;
+  }
+
+  Future _updateCategory(ItemCategory category) async {
+    await _categories.doc(category.id).update(category.toDocument());
+  }
+
+  Future<bool> _checkCategoryDuplicated(ItemCategory category) async {
+    return await _categories
+        .where('name', isEqualTo: category.name)
+        .get()
+        .then((snap) {
+      if (snap.size == 0) return false;
+      if (snap.size == 1 && snap.docs.first.id == category.id) return false;
+      return true;
+    });
+  }
 
   Stream<List<Item>> getCategoryItems(ItemCategory category) {
     return _items
@@ -37,29 +63,43 @@ class Firestore {
         snapshot.docs.map((doc) => ItemCategory.fromSnapshot(doc)).toList());
   }
 
-  Stream<List<String>> getCategoriesIds() {
-    return _categories
-        .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => doc.id).toList());
+  Stream<ItemCategory> getCategoryUpdates(ItemCategory category) {
+    return _getCategory(category.id);
   }
 
-  Stream<ItemCategory> getCategory(String docId) {
+  Stream<ItemCategory> _getCategory(String docId) {
     return _categories
         .doc(docId)
         .snapshots()
         .map(((snap) => ItemCategory.fromSnapshot(snap)));
   }
 
-  Stream<ItemCategory> getCategoryUpdates(ItemCategory category) {
-    return getCategory(category.id);
+  // Items
+
+  Future<Item> saveItem(Item item) async {
+    if (item.id == '') {
+      return await _addItem(item);
+    } else {
+      await _items.doc(item.id).update(item.toDocument());
+      return item;
+    }
   }
 
-  // TODO check error on delete item
-  Stream<Item> getItem(String docId) {
-    return _items
-        .doc(docId)
-        .snapshots()
-        .map(((snap) => Item.fromSnapshot(snap)));
+  Future<Item> _addItem(Item item) async {
+    if (await _checkItemDuplicated(item)) {
+      throw DuplicatedElementException(
+          'Item with name ${item.name} already exists');
+    }
+    var doc = await _items.add(item.toDocument());
+    item = item.copyWith(id: doc.id);
+
+    String categoryId = await _categories
+        .where('name', isEqualTo: item.category)
+        .get()
+        .then((value) => value.docs.first.id);
+    _addItemToCategory(item.id, categoryId);
+
+    return item;
   }
 
   Future deleteItem(Item item) async {
@@ -89,67 +129,7 @@ class Firestore {
     _categories.doc(categoryId).update({'items_doc': itemsId});
   }
 
-  // Stream<QuerySnapshot<ItemCategory>> getCategories2() {
-  //   return _categories
-  //       .withConverter<ItemCategory>(
-  //           fromFirestore: fromFirestore, toFirestore: toFirestore)
-  //       .snapshots();
-  // }
-
-  Future<ItemCategory> addCategory(ItemCategory category) async {
-    if (await checkCategoryDuplicated(category)) {
-      throw DuplicatedElementException(
-          'Category with name ${category.name} already exists');
-    }
-    var doc = await _categories.add(category.toDocument());
-    category = category.copyWith(id: doc.id);
-    return category;
-  }
-
-  Future updateCategory(ItemCategory category) async {
-    await _categories.doc(category.id).update(category.toDocument());
-  }
-
-  Future<Item> addItem(Item item) async {
-    if (await checkItemDuplicated(item)) {
-      throw DuplicatedElementException(
-          'Item with name ${item.name} already exists');
-    }
-    var doc = await _items.add(item.toDocument());
-    item = item.copyWith(id: doc.id);
-
-    String categoryId = await _categories
-        .where('name', isEqualTo: item.category)
-        .get()
-        .then((value) => value.docs.first.id);
-    _addItemToCategory(item.id, categoryId);
-
-    return item;
-  }
-
-  Future updateItem(Item item) async {
-    await _items.doc(item.id).update(item.toDocument());
-  }
-
-  Future<Item> saveItem(Item item) async {
-    if (item.id == '') {
-      return await addItem(item);
-    } else {
-      await _items.doc(item.id).update(item.toDocument());
-      return item;
-    }
-  }
-
-  Future<ItemCategory> saveCategory(ItemCategory category) async {
-    if (category.id == '') {
-      return await addCategory(category);
-    } else {
-      await updateCategory(category);
-      return category;
-    }
-  }
-
-  Future<bool> checkItemDuplicated(Item item) async {
+  Future<bool> _checkItemDuplicated(Item item) async {
     return await _items.where('name', isEqualTo: item.name).get().then((snap) {
       if (snap.size == 0) return false;
       if (snap.size == 1 && snap.docs.first.id == item.id) return false;
@@ -157,16 +137,7 @@ class Firestore {
     });
   }
 
-  Future<bool> checkCategoryDuplicated(ItemCategory category) async {
-    return await _categories
-        .where('name', isEqualTo: category.name)
-        .get()
-        .then((snap) {
-      if (snap.size == 0) return false;
-      if (snap.size == 1 && snap.docs.first.id == category.id) return false;
-      return true;
-    });
-  }
+  // Sample data
 
   Future<void> fillData() async {
     ItemCategory cat1 =
@@ -176,9 +147,9 @@ class Firestore {
 
     ItemCategory cat3 = ItemCategory(name: 'Sweets', color: Colors.green.value);
 
-    await addCategory(cat1);
-    await addCategory(cat2);
-    await addCategory(cat3);
+    await _addCategory(cat1);
+    await _addCategory(cat2);
+    await _addCategory(cat3);
 
     List<Item> items = [
       Item(name: 'vodka', category: cat1.name, favAddDate: null, imgUrl: ''),
@@ -194,7 +165,7 @@ class Firestore {
     ];
 
     for (var item in items) {
-      await addItem(item);
+      await _addItem(item);
     }
   }
 }

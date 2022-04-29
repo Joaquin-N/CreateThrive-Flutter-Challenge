@@ -128,7 +128,7 @@ class FilteringBar extends StatelessWidget {
                     controller.clear();
                     onClear();
                   },
-                  icon: Icon(Icons.clear),
+                  icon: const Icon(Icons.clear),
                 ),
               ),
             ),

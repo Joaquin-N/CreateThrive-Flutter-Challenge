@@ -54,7 +54,7 @@ class CreateItemCubit extends Cubit<CreateItemState> {
       repository.createItem(item);
       emit(CreateItemSaved(item: item, categoriesNames: state.categoriesNames));
       emit(CreateItemInitial(
-          item: Item.empty(), categoriesNames: state.categoriesNames));
+          item: const Item.empty(), categoriesNames: state.categoriesNames));
     } on DuplicatedElementException {
       emit(CreateItemReady(item: item, categoriesNames: state.categoriesNames));
     }

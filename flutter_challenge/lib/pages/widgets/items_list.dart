@@ -138,7 +138,7 @@ class ItemListTile extends StatelessWidget {
       child: ListTile(
         shape: const UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.grey, width: 1)),
-        onLongPress: () => print('edit'),
+        onLongPress: () {},
         title: Text(item.name),
         subtitle: favorite
             ? Text(

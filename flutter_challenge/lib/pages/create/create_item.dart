@@ -11,7 +11,6 @@ class CreateItemPage extends StatelessWidget {
   final TextEditingController tec;
   const CreateItemPage({Key? key, required this.tec}) : super(key: key);
 
-
   // TODO disable textFieldFocus
   @override
   Widget build(BuildContext context) {
@@ -36,7 +35,7 @@ class CreateItemPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('Category', style: defaultTextStyle),
-                SizedBox(width: 30),
+                const SizedBox(width: 30),
                 DropdownButton<String>(
                   items: List.generate(
                     state.categoriesNames.length,
@@ -56,7 +55,7 @@ class CreateItemPage extends StatelessWidget {
             Column(
               children: [
                 Text('Image', style: defaultTextStyle),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 if (state.item.localImgPath != null)
                   Container(
                     height: 200,
@@ -72,7 +71,7 @@ class CreateItemPage extends StatelessWidget {
                     height: 200,
                     width: 250,
                     color: Colors.grey.shade400,
-                    child: Text('Select image'),
+                    child: const Text('Select image'),
                   ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -81,12 +80,12 @@ class CreateItemPage extends StatelessWidget {
                     children: [
                       TextButton(
                         onPressed: cubit.clearImage,
-                        child: Text('Clear'),
+                        child: const Text('Clear'),
                         style: TextButton.styleFrom(primary: Colors.red),
                       ),
                       TextButton(
                         onPressed: cubit.selectImage,
-                        child: Text('Select'),
+                        child: const Text('Select'),
                       ),
                     ],
                   ),
@@ -97,7 +96,7 @@ class CreateItemPage extends StatelessWidget {
             ElevatedButton(
               style: ElevatedButton.styleFrom(primary: itemColor),
               onPressed: state is CreateItemReady ? cubit.save : null,
-              child: Text('Create Item'),
+              child: const Text('Create Item'),
             ),
           ],
         );

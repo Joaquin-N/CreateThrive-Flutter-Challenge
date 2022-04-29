@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_challenge/constants.dart';
 import 'package:flutter_challenge/cubits/category/category_cubit.dart';
-import 'package:flutter_challenge/cubits/data/data_cubit.dart';
-import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
-import 'package:flutter_challenge/models/item.dart';
-import 'package:flutter_challenge/models/item_category.dart';
 import 'package:flutter_challenge/pages/widgets/items_list.dart';
 import 'package:flutter_challenge/pages/widgets/custom_snack_bar.dart';
-import 'package:flutter_challenge/repositories/data_repository.dart';
-import 'package:intl/intl.dart';
 
 class FavoriteItemsList extends StatelessWidget {
   const FavoriteItemsList({
