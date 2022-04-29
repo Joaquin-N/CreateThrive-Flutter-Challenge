@@ -5,8 +5,10 @@ abstract class DataState {
   final List<ItemCategory> categories;
   final String filter;
 
-  List<ItemCategory> get categoriesWithFilter =>
-      categories.where((element) => element.name.contains(filter)).toList();
+  List<ItemCategory> get categoriesWithFilter => categories
+      .where((element) =>
+          element.name.toLowerCase().contains(filter.toLowerCase()))
+      .toList();
 
   const DataState(this.categories, this.filter);
 }

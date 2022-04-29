@@ -13,7 +13,7 @@ abstract class CategoryState {
         ..sort(((a, b) => a.favAddDate!.isAfter(b.favAddDate!) ? -1 : 1));
 
   List<Item> get itemsWithFilter =>
-      items.where((element) => element.name.contains(filter)).toList();
+      items.where((element) => element.name.toLowerCase().contains(filter.toLowerCase())).toList();
 
   const CategoryState(this.category, this.items, this.filter,
       this.lastFavoriteRemoved, this.lastFavoriteAdded);
