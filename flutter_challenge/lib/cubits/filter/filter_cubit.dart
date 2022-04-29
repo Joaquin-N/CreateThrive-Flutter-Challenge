@@ -1,11 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_challenge/cubits/application/application_cubit.dart';
 
 part 'filter_state.dart';
 
 class FilterCubit extends Cubit<FilterState> {
-  FilterCubit() : super(FilterState());
+  FilterCubit() : super(const FilterState());
 
   void search(String value) {
     if (value == '') {
@@ -16,17 +15,7 @@ class FilterCubit extends Cubit<FilterState> {
   }
 
   void toggleFilter() {
-    if (state.categories) {
-      emit(FilterState(
-          categories: false,
-          itemFilter: state.categoryFilter,
-          categoryFilter: state.itemFilter));
-    } else {
-      emit(FilterState(
-          categories: true,
-          itemFilter: state.categoryFilter,
-          categoryFilter: state.itemFilter));
-    }
+    emit(state.copyWith(categories: !state.categories));
   }
 
   void cancelFilter() {
@@ -34,14 +23,14 @@ class FilterCubit extends Cubit<FilterState> {
   }
 
   void _disable() {
-    emit(FilterState(categories: state.categories));
+    emit(state.copyWith(itemFilter: '', categoryFilter: ''));
   }
 
   void _filter(String value) {
     if (state.categories) {
-      emit(FilterState(categories: state.categories, categoryFilter: value));
+      emit(state.copyWith(categoryFilter: value));
     } else {
-      emit(FilterState(categories: state.categories, itemFilter: value));
+      emit(state.copyWith(itemFilter: value));
     }
   }
 }

@@ -2,12 +2,9 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
-import 'package:flutter_challenge/cubits/item/item_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
 import 'package:flutter_challenge/repositories/data_repository.dart';
-import 'package:flutter_challenge/services/firestore.dart';
 import 'package:meta/meta.dart';
 
 part 'category_state.dart';
@@ -18,89 +15,27 @@ class CategoryCubit extends Cubit<CategoryState> {
   StreamSubscription? itemsSubscription;
 
   CategoryCubit({required category, required this.repository})
-      : super(LoadingCategory()) {
+      : super(CategoryState(ItemCategory.empty())) {
     _loadCategory(category);
-    //_loadItems();
-
-    // filterStateStream.listen((filterState) async {
-    //   if (state.category.itemsId.isEmpty) return;
-
-    //   if (filterState.favorites) {
-    //     await Future.delayed(Duration(milliseconds: 1));
-    //     for (ItemCubit cubit in state.items) {
-    //       if (cubit.state is! ItemNotShowing) {
-    //         _show();
-    //         return;
-    //       }
-    //     }
-    //     _hide();
-    //   } else if (!filterState.enabled) {
-    //     _show();
-    //   } else if (filterState.categories) {
-    //     if (state.category.name.startsWith(filterState.value)) {
-    //       _show();
-    //     } else {
-    //       _hide();
-    //     }
-    //   } else {
-    //     await Future.delayed(Duration(milliseconds: 1));
-    //     for (ItemCubit cubit in state.items) {
-    //       if (cubit.state is! ItemNotShowing) {
-    //         _show();
-    //         return;
-    //       }
-    //     }
-    //     _hide();
-    //   }
-    // });
   }
 
   void toggleShow() {
-    if (state is CategoryShowItems) {
-      emit(CategoryHideItems(state));
-    } else {
-      emit(CategoryShowItems(state));
-    }
+    emit(state.copyWith(showItems: !state.showItems));
   }
 
   void applyFilter(String filter) {
     if (filter != state.filter) {
-      emit(state is CategoryShowItems
-          ? CategoryShowItems(state, filter: filter)
-          : CategoryHideItems(state, filter: filter));
-    }
-  }
-
-  void _updateState(
-      {ItemCategory? category,
-      List<Item>? items,
-      String? filter,
-      Item? lastFavoriteRemoved,
-      Item? lastFavoriteAdded}) {
-    if (state is CategoryHideItems) {
-      emit(CategoryHideItems(state,
-          category: category,
-          items: items,
-          filter: filter,
-          lastFavoriteRemoved: lastFavoriteRemoved,
-          lastFavoriteAdded: lastFavoriteAdded));
-    } else {
-      emit(CategoryShowItems(state,
-          category: category,
-          items: items,
-          filter: filter,
-          lastFavoriteRemoved: lastFavoriteRemoved,
-          lastFavoriteAdded: lastFavoriteAdded));
+      emit(state.copyWith(filter: filter));
     }
   }
 
   void toggleFav(Item item) {
     if (item.favAddDate == null) {
       item.favAddDate = DateTime.now();
-      _updateState(lastFavoriteAdded: item);
+      emit(state.copyWith(lastFavoriteAdded: item));
     } else {
       item.favAddDate = null;
-      _updateState(lastFavoriteRemoved: item);
+      emit(state.copyWith(lastFavoriteRemoved: item));
     }
 
     repository.saveItem(item);
@@ -116,7 +51,7 @@ class CategoryCubit extends Cubit<CategoryState> {
     repository.saveCategory(category);
     // state update is handled locally to avoid delay
     _reorderItems(oldIndex, newIndex);
-    emit(CategoryShowItems(state, category: category));
+    emit(state.copyWith(category: category));
   }
 
   void _reorderItems(oldIndex, newIndex) {
@@ -132,7 +67,7 @@ class CategoryCubit extends Cubit<CategoryState> {
         repository.getCategoryUpdates(category).listen((update) {
       // This statement prevents rebuilding the ui when items rearanged
       if (state.category.hasSameProperties(update)) return;
-      _updateState(category: update);
+      emit(state.copyWith(category: update));
       _loadItems();
     });
   }
@@ -141,13 +76,13 @@ class CategoryCubit extends Cubit<CategoryState> {
     if (itemsSubscription != null) itemsSubscription!.cancel();
 
     if (state.category.itemsId.isEmpty) {
-      _updateState(items: []);
+      emit(state.copyWith(items: []));
       return;
     }
     itemsSubscription =
         repository.getCategoryItems(state.category).listen((items) {
       items = state.category.sortItems(items);
-      _updateState(items: items);
+      emit(state.copyWith(items: items));
     });
   }
 

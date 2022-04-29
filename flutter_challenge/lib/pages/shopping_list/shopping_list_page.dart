@@ -50,7 +50,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
                 //previous.runtimeType != current.runtimeType ||
                 previous.categories.length != current.categories.length,
             builder: (context, state) {
-              if (state is DataReady) {
+              if (!state.loading) {
                 return ScrollConfiguration(
                   behavior: const ScrollBehavior().copyWith(overscroll: false),
                   child: ListView(

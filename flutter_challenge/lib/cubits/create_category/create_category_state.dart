@@ -4,13 +4,6 @@ part of 'create_category_cubit.dart';
 abstract class CreateCategoryState {
   final ItemCategory category;
   const CreateCategoryState(this.category);
-  CreateCategoryState._(CreateCategoryState state) : category = state.category;
-
-  CreateCategoryUpdated toUpdated() => CreateCategoryUpdated._(this);
-  CreateCategoryReady toReady() => CreateCategoryReady._(this);
-  CreateCategorySaved toSaved() => CreateCategorySaved._(this);
-  CreateCategoryErrorDuplicated toErrorDuplicated() =>
-      CreateCategoryErrorDuplicated._(this);
 }
 
 class CreateCategoryInitial extends CreateCategoryState {
@@ -19,17 +12,19 @@ class CreateCategoryInitial extends CreateCategoryState {
 }
 
 class CreateCategoryUpdated extends CreateCategoryState {
-  CreateCategoryUpdated._(CreateCategoryState state) : super._(state);
+  const CreateCategoryUpdated({required ItemCategory category})
+      : super(category);
 }
 
 class CreateCategorySaved extends CreateCategoryState {
-  CreateCategorySaved._(CreateCategoryState state) : super._(state);
+  const CreateCategorySaved({required ItemCategory category}) : super(category);
 }
 
 class CreateCategoryReady extends CreateCategoryState {
-  CreateCategoryReady._(CreateCategoryState state) : super._(state);
+  const CreateCategoryReady({required ItemCategory category}) : super(category);
 }
 
 class CreateCategoryErrorDuplicated extends CreateCategoryState {
-  CreateCategoryErrorDuplicated._(CreateCategoryState state) : super._(state);
+  const CreateCategoryErrorDuplicated({required ItemCategory category})
+      : super(category);
 }

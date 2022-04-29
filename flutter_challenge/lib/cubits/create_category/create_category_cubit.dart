@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter_challenge/exceptions.dart';
 import 'package:flutter_challenge/models/item_category.dart';
 import 'package:flutter_challenge/repositories/data_repository.dart';
-import 'package:flutter_challenge/services/firestore.dart';
 import 'package:meta/meta.dart';
 
 part 'create_category_state.dart';
@@ -16,9 +15,9 @@ class CreateCategoryCubit extends Cubit<CreateCategoryState> {
     if (name != null) state.category.name = name;
     if (color != null) state.category.color = color;
     if (state.category.validate()) {
-      emit(state.toReady());
+      emit(CreateCategoryReady(category: state.category));
     } else {
-      emit(state.toUpdated());
+      emit(CreateCategoryUpdated(category: state.category));
     }
   }
 
@@ -26,10 +25,10 @@ class CreateCategoryCubit extends Cubit<CreateCategoryState> {
     ItemCategory category = state.category;
     try {
       repository.saveCategory(category);
-      emit(state.toSaved());
+      emit(CreateCategorySaved(category: category));
       emit(CreateCategoryInitial(category: ItemCategory.empty()));
     } on DuplicatedElementException {
-      emit(state.toErrorDuplicated());
+      emit(CreateCategoryErrorDuplicated(category: category));
     }
   }
 }

@@ -14,7 +14,7 @@ class FavoritesPage extends StatelessWidget {
       buildWhen: (previous, current) =>
           previous.categories.length != current.categories.length,
       builder: (context, state) {
-        if (state is DataReady) {
+        if (!state.loading) {
           return ScrollConfiguration(
             behavior: const ScrollBehavior().copyWith(overscroll: false),
             child: ListView(

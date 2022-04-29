@@ -5,15 +5,6 @@ abstract class CreateItemState {
   final Item item;
   final List<String> categoriesNames;
   const CreateItemState(this.item, this.categoriesNames);
-  CreateItemState._(CreateItemState state)
-      : item = state.item,
-        categoriesNames = state.categoriesNames;
-
-  CreateItemUpdated toUpdated() => CreateItemUpdated._(this);
-  CreateItemReady toReady() => CreateItemReady._(this);
-  CreateItemSaved toSaved() => CreateItemSaved._(this);
-  CreateItemErrorDuplicated toErrorDuplicated() =>
-      CreateItemErrorDuplicated._(this);
 }
 
 class CreateItemInitial extends CreateItemState {
@@ -23,17 +14,25 @@ class CreateItemInitial extends CreateItemState {
 }
 
 class CreateItemUpdated extends CreateItemState {
-  CreateItemUpdated._(CreateItemState state) : super._(state);
+  const CreateItemUpdated(
+      {required Item item, required List<String> categoriesNames})
+      : super(item, categoriesNames);
 }
 
 class CreateItemReady extends CreateItemState {
-  CreateItemReady._(CreateItemState state) : super._(state);
+  const CreateItemReady(
+      {required Item item, required List<String> categoriesNames})
+      : super(item, categoriesNames);
 }
 
 class CreateItemSaved extends CreateItemState {
-  CreateItemSaved._(CreateItemState state) : super._(state);
+  const CreateItemSaved(
+      {required Item item, required List<String> categoriesNames})
+      : super(item, categoriesNames);
 }
 
 class CreateItemErrorDuplicated extends CreateItemState {
-  CreateItemErrorDuplicated._(CreateItemState state) : super._(state);
+  const CreateItemErrorDuplicated(
+      {required Item item, required List<String> categoriesNames})
+      : super(item, categoriesNames);
 }

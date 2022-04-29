@@ -30,9 +30,11 @@ class CreateItemCubit extends Cubit<CreateItemState> {
     }
     if (image != null) state.item.localImgPath = image;
     if (state.item.validate()) {
-      emit(state.toReady());
+      emit(CreateItemReady(
+          item: state.item, categoriesNames: state.categoriesNames));
     } else {
-      emit(state.toUpdated());
+      emit(CreateItemUpdated(
+          item: state.item, categoriesNames: state.categoriesNames));
     }
   }
 
@@ -57,11 +59,11 @@ class CreateItemCubit extends Cubit<CreateItemState> {
     Item item = state.item;
     try {
       repository.createItem(item);
-      emit(state.toSaved());
+      emit(CreateItemSaved(item: item, categoriesNames: state.categoriesNames));
       emit(CreateItemInitial(
           item: Item.empty(), categoriesNames: state.categoriesNames));
     } on DuplicatedElementException {
-      emit(state.toErrorDuplicated());
+      emit(CreateItemReady(item: item, categoriesNames: state.categoriesNames));
     }
   }
 }

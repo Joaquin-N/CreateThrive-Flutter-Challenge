@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:flutter_challenge/cubits/category/category_cubit.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
@@ -11,38 +13,29 @@ part 'data_state.dart';
 
 class DataCubit extends Cubit<DataState> {
   final DataRepository repository;
-  //final FilterCubit filterCubit;
+  StreamSubscription? suscription;
 
-  DataCubit({required this.repository}) : super(DataLoading()) {
+  DataCubit({required this.repository}) : super(const DataState()) {
     _loadCategories();
   }
 
-  // void toggleShow(ItemCategory category) {
-  //   category.toggleShow();
-  //   emit(AppReady(categories));
-  // }
-// TODO cancel subscriptions
   void _loadCategories() {
-    repository.getCategories().listen((event) {
+    suscription = repository.getCategories().listen((event) {
       if (state.categories.length != event.length) {
-        emit(DataReady(event));
+        emit(state.copyWith(categories: event));
       }
     });
   }
 
   void applyFilter(String filter) {
     if (filter != state.filter) {
-      emit(DataReady(state.categories, filter: filter));
+      emit(state.copyWith(filter: filter));
     }
   }
 
-  // void _loadItems() {
-  //   for (ItemCategory cat in categories) {
-  //     fs.getCategoryItems(cat).listen((items) {
-  //       cat.items = items;
-  //       print('Items of category ${cat.name} reloaded');
-  //       emit(AppReady(categories));
-  //     });
-  //   }
-  // }
+  @override
+  Future<void> close() {
+    suscription?.cancel();
+    return super.close();
+  }
 }

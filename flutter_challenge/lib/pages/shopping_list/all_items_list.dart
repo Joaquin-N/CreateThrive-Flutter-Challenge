@@ -5,7 +5,6 @@ import 'package:flutter_challenge/constants.dart';
 import 'package:flutter_challenge/cubits/category/category_cubit.dart';
 import 'package:flutter_challenge/cubits/data/data_cubit.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
-import 'package:flutter_challenge/cubits/item/item_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
 import 'package:flutter_challenge/pages/widgets/custom_snack_bar.dart';
@@ -52,7 +51,7 @@ class AllItemsList extends StatelessWidget {
           child: BlocBuilder<CategoryCubit, CategoryState>(
             bloc: cubit,
             builder: (context, state) {
-              if (state is LoadingCategory) {
+              if (state.loading) {
                 return Container();
               }
 
@@ -72,7 +71,7 @@ class AllItemsList extends StatelessWidget {
                     onToggleFav: cubit.toggleFav,
                     onDelete: cubit.delete,
                     onToggleShow: cubit.toggleShow,
-                    show: state is CategoryShowItems,
+                    show: state.showItems,
                     onReorder: reorderEnabled ? cubit.reorder : null,
                   ));
             },

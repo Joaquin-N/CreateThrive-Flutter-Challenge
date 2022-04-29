@@ -1,54 +1,48 @@
 part of 'category_cubit.dart';
 
 @immutable
-abstract class CategoryState {
+class CategoryState {
   final ItemCategory category;
   final List<Item> items;
   final String filter;
+  final bool showItems;
   final Item? lastFavoriteRemoved;
   final Item? lastFavoriteAdded;
+  final bool loading;
 
   List<Item> get favoriteItems =>
       items.where((element) => element.isFavorite()).toList()
         ..sort(((a, b) => a.favAddDate!.isAfter(b.favAddDate!) ? -1 : 1));
 
-  List<Item> get itemsWithFilter =>
-      items.where((element) => element.name.toLowerCase().contains(filter.toLowerCase())).toList();
+  List<Item> get itemsWithFilter => items
+      .where((element) =>
+          element.name.toLowerCase().contains(filter.toLowerCase()))
+      .toList();
 
-  const CategoryState(this.category, this.items, this.filter,
-      this.lastFavoriteRemoved, this.lastFavoriteAdded);
-}
+  const CategoryState(this.category)
+      : items = const [],
+        filter = '',
+        showItems = true,
+        loading = true,
+        lastFavoriteAdded = null,
+        lastFavoriteRemoved = null;
 
-class LoadingCategory extends CategoryState {
-  LoadingCategory() : super(ItemCategory.empty(), [], '', null, null);
-}
+  const CategoryState._(this.category, this.items, this.showItems, this.filter,
+      this.lastFavoriteRemoved, this.lastFavoriteAdded)
+      : loading = false;
 
-class CategoryHideItems extends CategoryState {
-  CategoryHideItems(CategoryState state,
-      {ItemCategory? category,
-      List<Item>? items,
-      String? filter,
-      Item? lastFavoriteRemoved,
-      Item? lastFavoriteAdded})
-      : super(
-            category ?? state.category,
-            items ?? state.items,
-            filter ?? state.filter,
-            lastFavoriteRemoved ?? state.lastFavoriteRemoved,
-            lastFavoriteAdded ?? state.lastFavoriteAdded);
-}
-
-class CategoryShowItems extends CategoryState {
-  CategoryShowItems(CategoryState state,
-      {ItemCategory? category,
-      List<Item>? items,
-      String? filter,
-      Item? lastFavoriteRemoved,
-      Item? lastFavoriteAdded})
-      : super(
-            category ?? state.category,
-            items ?? state.items,
-            filter ?? state.filter,
-            lastFavoriteRemoved ?? state.lastFavoriteRemoved,
-            lastFavoriteAdded ?? state.lastFavoriteAdded);
+  CategoryState copyWith(
+          {ItemCategory? category,
+          List<Item>? items,
+          bool? showItems,
+          String? filter,
+          Item? lastFavoriteRemoved,
+          Item? lastFavoriteAdded}) =>
+      CategoryState._(
+          category ?? this.category,
+          items ?? this.items,
+          showItems ?? this.showItems,
+          filter ?? this.filter,
+          lastFavoriteRemoved ?? this.lastFavoriteRemoved,
+          lastFavoriteAdded ?? this.lastFavoriteAdded);
 }
