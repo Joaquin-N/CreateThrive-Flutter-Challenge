@@ -31,7 +31,7 @@ class ItemCategory {
 
   bool isEqualToAny(List<ItemCategory> categories) {
     for (var category in categories) {
-      if (hasSameProperties(category)) return true;
+      if (name == category.name) return true;
     }
     return false;
   }

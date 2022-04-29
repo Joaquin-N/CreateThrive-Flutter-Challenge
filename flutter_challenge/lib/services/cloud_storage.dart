@@ -20,7 +20,9 @@ class CloudStorage {
   }
 
   Future deleteImage(String url) async {
-    var ref = FirebaseStorage.instance.refFromURL(url);
-    await ref.delete();
+    try {
+      var ref = FirebaseStorage.instance.refFromURL(url);
+      await ref.delete();
+    } catch (e) {}
   }
 }

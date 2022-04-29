@@ -140,7 +140,10 @@ class CategoryCubit extends Cubit<CategoryState> {
   void _loadItems() {
     if (itemsSubscription != null) itemsSubscription!.cancel();
 
-    if (state.category.itemsId.isEmpty) return;
+    if (state.category.itemsId.isEmpty) {
+      _updateState(items: []);
+      return;
+    }
     itemsSubscription =
         repository.getCategoryItems(state.category).listen((items) {
       items = state.category.sortItems(items);

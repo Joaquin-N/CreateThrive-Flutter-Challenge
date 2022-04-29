@@ -4,9 +4,9 @@ import 'package:flutter_challenge/constants.dart';
 import 'package:flutter_challenge/cubits/data/data_cubit.dart';
 import 'package:flutter_challenge/cubits/category/category_cubit.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
-import 'package:flutter_challenge/pages/shopping_list/category_items_list.dart';
+import 'package:flutter_challenge/pages/shopping_list/all_items_list.dart';
 import 'package:flutter_challenge/pages/widgets/filter_button.dart';
-import 'package:flutter_challenge/pages/widgets/items_list.dart';
+import 'package:flutter_challenge/repositories/data_repository.dart';
 
 class ShoppingListPage extends StatefulWidget {
   const ShoppingListPage({Key? key}) : super(key: key);
@@ -27,53 +27,48 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        BlocBuilder<FilterCubit, FilterState>(
-          builder: (context, state) {
-            var cubit = context.read<FilterCubit>();
-            return FilteringBar(
-              buttonText: state.categories ? 'Categories' : 'Items',
-              controller: controller,
-              color: state.categories ? categoryColor : itemColor,
-              onFilterChange: cubit.toggleFilter,
-              onTextChange: cubit.search,
-              onClear: cubit.cancelFilter,
-            );
-          },
-        ),
+        BlocConsumer<FilterCubit, FilterState>(
+            builder: (context, state) {
+              var cubit = context.read<FilterCubit>();
+              return FilteringBar(
+                buttonText: state.categories ? 'Categories' : 'Items',
+                controller: controller,
+                color: state.categories ? categoryColor : itemColor,
+                onFilterChange: cubit.toggleFilter,
+                onTextChange: cubit.search,
+                onClear: cubit.cancelFilter,
+              );
+            },
+            listenWhen: (previous, current) =>
+                previous.categoryFilter != current.categoryFilter,
+            listener: (context, filterState) {
+              context.read<DataCubit>().applyFilter(filterState.categoryFilter);
+            }),
         Expanded(
-          child: BlocBuilder<FilterCubit, FilterState>(
-              buildWhen: (previous, current) =>
-                  previous.categoryFilter != current.categoryFilter,
-              builder: (context, filterState) {
-                context
-                    .read<DataCubit>()
-                    .applyFilter(filterState.categoryFilter);
-                return BlocBuilder<DataCubit, DataState>(
-                  buildWhen: (previous, current) =>
-                      previous.runtimeType != current.runtimeType ||
-                      previous.categoriesWithFilter.length !=
-                          current.categoriesWithFilter.length,
-                  builder: (context, state) {
-                    if (state is DataReady) {
-                      return ScrollConfiguration(
-                        behavior:
-                            const ScrollBehavior().copyWith(overscroll: false),
-                        child: ListView(
-                          shrinkWrap: true,
-                          children: List.generate(
-                              state.categoriesWithFilter.length, (index) {
-                            //TODO put favorites
-                            return CategoryItemsList(
-                                cubit: state.categoriesWithFilter[index]);
-                          }),
-                        ),
-                      );
-                    } else {
-                      return Container();
-                    }
-                  },
+          child: BlocBuilder<DataCubit, DataState>(
+            buildWhen: (previous, current) =>
+                //previous.runtimeType != current.runtimeType ||
+                previous.categories.length != current.categories.length,
+            builder: (context, state) {
+              if (state is DataReady) {
+                return ScrollConfiguration(
+                  behavior: const ScrollBehavior().copyWith(overscroll: false),
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: List.generate(state.categories.length, (index) {
+                      return AllItemsList(
+                          cubit: CategoryCubit(
+                              category: state.categories[index],
+                              repository: RepositoryProvider.of<DataRepository>(
+                                  context)));
+                    }),
+                  ),
                 );
-              }),
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
         ),
       ],
     );
@@ -138,13 +133,6 @@ class FilteringBar extends StatelessWidget {
               ),
             ),
           ),
-          // IconButton(
-          //   onPressed: () {
-          //     controller.clear();
-          //     onClear();
-          //   },
-          //   icon: Icon(Icons.cancel_rounded, color: Colors.grey),
-          // ),
         ],
       ),
     );

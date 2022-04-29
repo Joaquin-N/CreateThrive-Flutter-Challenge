@@ -147,33 +147,6 @@ class Firestore {
     }
   }
 
-  Future<void> fillData() async {
-    ItemCategory cat1 = ItemCategory.empty()
-      ..name = 'cat1'
-      ..color = Colors.red.value;
-
-    ItemCategory cat2 = ItemCategory.empty()
-      ..name = 'cat2'
-      ..color = Colors.blue.value;
-
-    await addCategory(cat1);
-    await addCategory(cat2);
-
-    Item item1 = Item.empty()
-      ..name = 'item1'
-      ..category = cat1.name;
-    Item item2 = Item.empty()
-      ..name = 'item2'
-      ..category = cat1.name;
-    Item item3 = Item.empty()
-      ..name = 'item3'
-      ..category = cat2.name;
-
-    await addItem(item1);
-    await addItem(item2);
-    await addItem(item3);
-  }
-
   Future<bool> checkItemDuplicated(Item item) async {
     return await _items.where('name', isEqualTo: item.name).get().then((snap) {
       if (snap.size == 0) return false;
@@ -191,5 +164,57 @@ class Firestore {
       if (snap.size == 1 && snap.docs.first.id == category.id) return false;
       return true;
     });
+  }
+
+  Future<void> fillData() async {
+    ItemCategory cat1 = ItemCategory.empty()
+      ..name = 'Alcoholic Drinks'
+      ..color = Colors.purple.value;
+
+    ItemCategory cat2 = ItemCategory.empty()
+      ..name = 'Food'
+      ..color = Colors.orange.value;
+
+    ItemCategory cat3 = ItemCategory.empty()
+      ..name = 'Sweets'
+      ..color = Colors.green.value;
+
+    await addCategory(cat1);
+    await addCategory(cat2);
+    await addCategory(cat3);
+
+    List<Item> items = [
+      Item.empty()
+        ..name = 'Wine'
+        ..category = cat1.name,
+      Item.empty()
+        ..name = 'beer'
+        ..category = cat1.name,
+      Item.empty()
+        ..name = 'Gin'
+        ..category = cat1.name,
+      Item.empty()
+        ..name = 'Apple'
+        ..category = cat2.name,
+      Item.empty()
+        ..name = 'Meat'
+        ..category = cat2.name,
+      Item.empty()
+        ..name = 'Bread'
+        ..category = cat2.name,
+      Item.empty()
+        ..name = 'Chocolate'
+        ..category = cat3.name,
+      Item.empty()
+        ..name = 'Candy'
+        ..category = cat3.name,
+      Item.empty()
+        ..name = 'Lollipop'
+        ..category = cat3.name,
+    ];
+
+    for (var item in items) {
+      await addItem(item);
+    }
   }
 }

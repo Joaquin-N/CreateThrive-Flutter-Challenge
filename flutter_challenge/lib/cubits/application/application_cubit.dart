@@ -20,7 +20,7 @@ class ApplicationCubit extends Cubit<ApplicationState> {
 
   void switchCreate(bool category) {
     emit(state is ApplicationCreateItem
-        ? const ApplicationCreateItem()
+        ? const ApplicationCreateCategory()
         : const ApplicationCreateItem());
   }
 }
