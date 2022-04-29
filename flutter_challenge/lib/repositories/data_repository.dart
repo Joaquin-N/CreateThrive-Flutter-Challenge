@@ -23,8 +23,9 @@ class DataRepository {
   Future saveItem(Item item) async => fs.saveItem(item);
 
   Future createItem(Item item) async {
-    await fs.saveItem(item);
-    item.imgUrl = await cs.uploadImage(item.localImgPath!, item.id);
+    item = await fs.saveItem(item);
+    item = item.copyWith(
+        imgUrl: await cs.uploadImage(item.localImgPath!, item.id));
     await fs.saveItem(item);
   }
 

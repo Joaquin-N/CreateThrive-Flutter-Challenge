@@ -1,10 +1,13 @@
 part of 'create_item_cubit.dart';
 
 @immutable
-abstract class CreateItemState {
+abstract class CreateItemState extends Equatable {
   final Item item;
   final List<String> categoriesNames;
   const CreateItemState(this.item, this.categoriesNames);
+
+  @override
+  List<Object?> get props => [item, categoriesNames];
 }
 
 class CreateItemInitial extends CreateItemState {

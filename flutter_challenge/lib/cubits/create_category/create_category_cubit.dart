@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter_challenge/exceptions.dart';
 import 'package:flutter_challenge/models/item_category.dart';
 import 'package:flutter_challenge/repositories/data_repository.dart';
@@ -12,12 +13,11 @@ class CreateCategoryCubit extends Cubit<CreateCategoryState> {
       : super(CreateCategoryInitial(category: ItemCategory.empty()));
 
   void update({String? name, int? color}) {
-    if (name != null) state.category.name = name;
-    if (color != null) state.category.color = color;
-    if (state.category.validate()) {
-      emit(CreateCategoryReady(category: state.category));
+    ItemCategory category = state.category.copyWith(name: name, color: color);
+    if (category.validate()) {
+      emit(CreateCategoryReady(category: category));
     } else {
-      emit(CreateCategoryUpdated(category: state.category));
+      emit(CreateCategoryUpdated(category: category));
     }
   }
 

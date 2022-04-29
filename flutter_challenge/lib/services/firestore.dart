@@ -96,27 +96,27 @@ class Firestore {
   //       .snapshots();
   // }
 
-  Future<bool> addCategory(ItemCategory category) async {
+  Future<ItemCategory> addCategory(ItemCategory category) async {
     if (await checkCategoryDuplicated(category)) {
       throw DuplicatedElementException(
           'Category with name ${category.name} already exists');
     }
     var doc = await _categories.add(category.toDocument());
-    category.id = doc.id;
-    return true;
+    category = category.copyWith(id: doc.id);
+    return category;
   }
 
   Future updateCategory(ItemCategory category) async {
     await _categories.doc(category.id).update(category.toDocument());
   }
 
-  Future<bool> addItem(Item item) async {
+  Future<Item> addItem(Item item) async {
     if (await checkItemDuplicated(item)) {
       throw DuplicatedElementException(
           'Item with name ${item.name} already exists');
     }
     var doc = await _items.add(item.toDocument());
-    item.id = doc.id;
+    item = item.copyWith(id: doc.id);
 
     String categoryId = await _categories
         .where('name', isEqualTo: item.category)
@@ -124,26 +124,28 @@ class Firestore {
         .then((value) => value.docs.first.id);
     _addItemToCategory(item.id, categoryId);
 
-    return true;
+    return item;
   }
 
   Future updateItem(Item item) async {
     await _items.doc(item.id).update(item.toDocument());
   }
 
-  Future saveItem(Item item) async {
+  Future<Item> saveItem(Item item) async {
     if (item.id == '') {
-      await addItem(item);
+      return await addItem(item);
     } else {
       await _items.doc(item.id).update(item.toDocument());
+      return item;
     }
   }
 
-  Future saveCategory(ItemCategory category) async {
+  Future<ItemCategory> saveCategory(ItemCategory category) async {
     if (category.id == '') {
-      await addCategory(category);
+      return await addCategory(category);
     } else {
       await updateCategory(category);
+      return category;
     }
   }
 
@@ -167,50 +169,28 @@ class Firestore {
   }
 
   Future<void> fillData() async {
-    ItemCategory cat1 = ItemCategory.empty()
-      ..name = 'Alcoholic Drinks'
-      ..color = Colors.purple.value;
+    ItemCategory cat1 =
+        ItemCategory(name: 'Alcoholic Drinks', color: Colors.purple.value);
 
-    ItemCategory cat2 = ItemCategory.empty()
-      ..name = 'Food'
-      ..color = Colors.orange.value;
+    ItemCategory cat2 = ItemCategory(name: 'Food', color: Colors.orange.value);
 
-    ItemCategory cat3 = ItemCategory.empty()
-      ..name = 'Sweets'
-      ..color = Colors.green.value;
+    ItemCategory cat3 = ItemCategory(name: 'Sweets', color: Colors.green.value);
 
     await addCategory(cat1);
     await addCategory(cat2);
     await addCategory(cat3);
 
     List<Item> items = [
-      Item.empty()
-        ..name = 'Wine'
-        ..category = cat1.name,
-      Item.empty()
-        ..name = 'beer'
-        ..category = cat1.name,
-      Item.empty()
-        ..name = 'Gin'
-        ..category = cat1.name,
-      Item.empty()
-        ..name = 'Apple'
-        ..category = cat2.name,
-      Item.empty()
-        ..name = 'Meat'
-        ..category = cat2.name,
-      Item.empty()
-        ..name = 'Bread'
-        ..category = cat2.name,
-      Item.empty()
-        ..name = 'Chocolate'
-        ..category = cat3.name,
-      Item.empty()
-        ..name = 'Candy'
-        ..category = cat3.name,
-      Item.empty()
-        ..name = 'Lollipop'
-        ..category = cat3.name,
+      Item(name: 'vodka', category: cat1.name, favAddDate: null, imgUrl: ''),
+      Item(name: 'Beer', category: cat1.name, favAddDate: null, imgUrl: ''),
+      Item(name: 'Gin', category: cat1.name, favAddDate: null, imgUrl: ''),
+      Item(name: 'Apple', category: cat2.name, favAddDate: null, imgUrl: ''),
+      Item(name: 'Meat', category: cat2.name, favAddDate: null, imgUrl: ''),
+      Item(name: 'Bread', category: cat2.name, favAddDate: null, imgUrl: ''),
+      Item(
+          name: 'Chocolate', category: cat3.name, favAddDate: null, imgUrl: ''),
+      Item(name: 'Candy', category: cat3.name, favAddDate: null, imgUrl: ''),
+      Item(name: 'Lollipop', category: cat3.name, favAddDate: null, imgUrl: ''),
     ];
 
     for (var item in items) {

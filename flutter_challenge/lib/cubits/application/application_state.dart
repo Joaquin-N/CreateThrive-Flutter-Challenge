@@ -1,9 +1,12 @@
 part of 'application_cubit.dart';
 
 @immutable
-class ApplicationState {
+abstract class ApplicationState extends Equatable {
   final String title;
   const ApplicationState(this.title);
+
+  @override
+  List<Object?> get props => [title];
 }
 
 class ApplicationShoppingList extends ApplicationState {

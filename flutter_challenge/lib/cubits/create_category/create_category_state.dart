@@ -1,9 +1,12 @@
 part of 'create_category_cubit.dart';
 
 @immutable
-abstract class CreateCategoryState {
+abstract class CreateCategoryState extends Equatable {
   final ItemCategory category;
   const CreateCategoryState(this.category);
+
+  @override
+  List<Object?> get props => [category];
 }
 
 class CreateCategoryInitial extends CreateCategoryState {

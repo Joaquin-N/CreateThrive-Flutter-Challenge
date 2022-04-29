@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter_challenge/exceptions.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/repositories/data_repository.dart';
-import 'package:flutter_challenge/services/firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meta/meta.dart';
 
@@ -12,7 +12,7 @@ class CreateItemCubit extends Cubit<CreateItemState> {
   final DataRepository repository;
   CreateItemCubit({required this.repository})
       : super(
-          CreateItemInitial(item: Item.empty(), categoriesNames: ['']),
+          const CreateItemInitial(item: Item.empty(), categoriesNames: ['']),
         ) {
     repository.getCategoriesNames().listen((categories) {
       emit(CreateItemInitial(
@@ -21,20 +21,14 @@ class CreateItemCubit extends Cubit<CreateItemState> {
   }
 
   void update({String? name, String? category, String? image}) {
-    if (name != null) state.item.name = name;
-    if (category != null) {
-      state.item.category = category;
-      if (category.isEmpty) {
-        state.item.category = null;
-      }
-    }
-    if (image != null) state.item.localImgPath = image;
-    if (state.item.validate()) {
-      emit(CreateItemReady(
-          item: state.item, categoriesNames: state.categoriesNames));
+    Item item = state.item
+        .copyWith(name: name, category: category, localImgPath: image);
+
+    if (item.validate()) {
+      emit(CreateItemReady(item: item, categoriesNames: state.categoriesNames));
     } else {
       emit(CreateItemUpdated(
-          item: state.item, categoriesNames: state.categoriesNames));
+          item: item, categoriesNames: state.categoriesNames));
     }
   }
 
@@ -51,8 +45,7 @@ class CreateItemCubit extends Cubit<CreateItemState> {
   }
 
   void clearImage() {
-    state.item.localImgPath = null;
-    update();
+    update(image: null);
   }
 
   void save() async {

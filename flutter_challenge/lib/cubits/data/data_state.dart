@@ -1,7 +1,7 @@
 part of 'data_cubit.dart';
 
 @immutable
-class DataState {
+class DataState extends Equatable {
   final List<ItemCategory> categories;
   final String filter;
   final bool loading;
@@ -19,4 +19,7 @@ class DataState {
 
   DataState copyWith({List<ItemCategory>? categories, String? filter}) =>
       DataState._(categories ?? this.categories, filter ?? this.filter);
+
+  @override
+  List<Object?> get props => [categories, filter, loading];
 }

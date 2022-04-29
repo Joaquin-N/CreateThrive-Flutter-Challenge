@@ -1,7 +1,7 @@
 part of 'category_cubit.dart';
 
 @immutable
-class CategoryState {
+class CategoryState extends Equatable {
   final ItemCategory category;
   final List<Item> items;
   final String filter;
@@ -45,4 +45,15 @@ class CategoryState {
           filter ?? this.filter,
           lastFavoriteRemoved ?? this.lastFavoriteRemoved,
           lastFavoriteAdded ?? this.lastFavoriteAdded);
+
+  @override
+  List<Object?> get props => [
+        category,
+        items,
+        filter,
+        showItems,
+        lastFavoriteAdded,
+        lastFavoriteRemoved,
+        loading
+      ];
 }

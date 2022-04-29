@@ -1,7 +1,7 @@
 part of 'filter_cubit.dart';
 
 @immutable
-class FilterState {
+class FilterState extends Equatable {
   final String itemFilter;
   final String categoryFilter;
   final bool categories;
@@ -16,4 +16,7 @@ class FilterState {
           {String? itemFilter, String? categoryFilter, bool? categories}) =>
       FilterState._(itemFilter ?? this.itemFilter,
           categoryFilter ?? this.categoryFilter, categories ?? this.categories);
+
+  @override
+  List<Object?> get props => [itemFilter, categoryFilter, categories];
 }

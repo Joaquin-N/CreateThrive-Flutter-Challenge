@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_challenge/models/item.dart';
 import 'package:flutter_challenge/models/item_category.dart';
@@ -31,10 +32,10 @@ class CategoryCubit extends Cubit<CategoryState> {
 
   void toggleFav(Item item) {
     if (item.favAddDate == null) {
-      item.favAddDate = DateTime.now();
+      item = item.copyWith(favAddDate: DateTime.now());
       emit(state.copyWith(lastFavoriteAdded: item));
     } else {
-      item.favAddDate = null;
+      item = item.clearFavAddDate();
       emit(state.copyWith(lastFavoriteRemoved: item));
     }
 

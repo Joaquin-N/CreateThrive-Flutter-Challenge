@@ -1,21 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_challenge/models/item.dart';
 
-class ItemCategory {
-  String id;
-  String name;
-  int color;
-  List<String> itemsId = [];
+class ItemCategory extends Equatable {
+  final String id;
+  final String name;
+  final int color;
+  final List<String> itemsId;
 
   //List<Item> _items = [];
 
-  ItemCategory({required this.id, required this.name, required this.color});
+  const ItemCategory(
+      {this.id = '',
+      required this.name,
+      required this.color,
+      this.itemsId = const []});
 
-  ItemCategory.empty()
+  const ItemCategory.empty()
       : id = '',
         name = '',
-        color = -1;
+        color = -1,
+        itemsId = const [];
+
   bool validate() => name != '' && color != -1;
 
   void addItemId(String id) {
@@ -48,42 +55,6 @@ class ItemCategory {
     return sorted;
   }
 
-  // set items(List<Item> values) {
-  //   _items.clear();
-  //   for (String doc in docs) {
-  //     _items.add(values.firstWhere((item) => item.id == doc));
-  //   }
-  // }
-
-  // List<Item> get items => _items;
-  // // TODO: Sort favorites
-  // List<Item> get favoriteItems =>
-  //     _items.where((item) => item.favAddDate != null).toList();
-
-  // void insertItem(Item item) {
-  //   int index = -1;
-  //   for (int i = 0; i < items.length; i++) {
-  //     if (items[i].id == item.id) {
-  //       index = i;
-  //       break;
-  //     }
-  //   }
-  //   if (index != -1) {
-  //     items.removeAt(index);
-  //     items.insert(index, item);
-  //   } else {
-  //     items.add(item);
-  //   }
-  // }
-
-  // void reorder(int oldIndex, int newIndex) {
-  //   if (oldIndex < newIndex) {
-  //     newIndex -= 1;
-  //   }
-  //   Item item = items.removeAt(oldIndex);
-  //   items.insert(newIndex, item);
-  // }
-
   void reorder(int oldIndex, int newIndex) {
     if (oldIndex < newIndex) {
       newIndex -= 1;
@@ -105,4 +76,19 @@ class ItemCategory {
         name = snap['name'],
         color = snap['color'],
         itemsId = snap['items_doc'].cast<String>();
+
+  ItemCategory copyWith(
+      {String? id,
+      String? name,
+      int? color,
+      List<String>? itemsId = const []}) {
+    return ItemCategory(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        color: color ?? this.color,
+        itemsId: itemsId ?? this.itemsId);
+  }
+
+  @override
+  List<Object?> get props => [id, name, color, itemsId];
 }

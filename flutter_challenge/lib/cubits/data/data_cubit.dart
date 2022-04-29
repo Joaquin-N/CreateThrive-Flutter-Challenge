@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter_challenge/cubits/category/category_cubit.dart';
 import 'package:flutter_challenge/cubits/filter/filter_cubit.dart';
 import 'package:flutter_challenge/models/item.dart';
